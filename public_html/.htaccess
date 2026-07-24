@@ -1,0 +1,27 @@
+Options -Indexes
+
+SetEnvIf Authorization "(.+)" HTTP_AUTHORIZATION=$1
+
+RewriteEngine On
+
+# Si la petición DIRECTA contiene .php (y no es internamente reescrita) => 404
+RewriteCond %{THE_REQUEST} \s/[^?\s]*\.php[\s?] [NC]
+RewriteRule ^ - [R=404,L]
+
+# Ingesta
+RewriteRule ^api/telemetry/?$ api/ingest.php [L]
+
+# APIs
+RewriteRule ^api/latest_sessions/?$ api/latest_sessions.php [L]
+RewriteRule ^api/participants/?$ api/participants.php [L]
+RewriteRule ^api/conductor_sessions/?$ api/conductor_sessions.php [L]
+RewriteRule ^api/session_detail/?$ api/session_detail.php [L]
+
+# Rutas públicas
+RewriteRule ^login/?$ login.php [L]
+RewriteRule ^logout/?$ logout.php [L]
+RewriteRule ^participantes/?$ participantes.php [L]
+RewriteRule ^participantes/([0-9]+)/?$ conductor.php?id=$1 [L,QSA]
+RewriteRule ^estadisticas/?$ estadisticas.php [L]
+RewriteRule ^opciones/?$ opciones.php [L]
+RewriteRule ^sesion/([^/]+)/?$ sesion.php?id=$1 [L,QSA]
