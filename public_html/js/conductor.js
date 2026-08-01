@@ -14,6 +14,7 @@ async function loadConductorSessions() {
         container.innerHTML = '<div class="empty-state">Falta el identificador del conductor.</div>';
         return;
     }
+
     try {
         const response = await fetch(`/api/conductor_sessions?id=${encodeURIComponent(participantId)}`);
         
@@ -28,12 +29,14 @@ async function loadConductorSessions() {
             container.innerHTML = `<div class="empty-state">${escapeHtml(json.error || 'No se pudo cargar')}</div>`;
             return;
         }
-        const sessions = json.sessions;
+
+        const sessions = json.sessions || [];
         if (!sessions.length) {
             status.textContent = 'No hay sesiones para este conductor.';
             container.innerHTML = '<div class="empty-state">No hay sesiones registradas para este conductor.</div>';
             return;
         }
+
         status.textContent = `Mostrando ${sessions.length} sesión(es) para ${escapeHtml(json.participant_name)}.`;
         container.innerHTML = renderTable(sessions);
     } catch (error) {
@@ -46,24 +49,27 @@ async function loadConductorSessions() {
 function renderTable(sessions) {
     const rows = sessions.map(session => `
         <tr>
-            <td>${escapeHtml(session.tested_at)}</td>
-            <td><span class="badge" style="background: rgba(96, 165, 250, 0.1); color: #60a5fa; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-family: monospace;">${escapeHtml(session.external_id)}</span></td>
+            <td>#${session.id}</td>
+            <td>${formatDateAR(session.tested_at)}</td>
             <td>${session.events_count}</td>
             <td><a href="/sesion/${session.id}" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Ver</a></td>
         </tr>
     `).join('');
+
     return `
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>ID</th>
-                    <th>Eventos</th>
-                    <th>Detalle</th>
-                </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-        </table>`;
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha</th>
+                        <th>Eventos</th>
+                        <th>Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
 }
 
 function escapeHtml(value) {
