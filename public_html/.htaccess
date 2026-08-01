@@ -16,6 +16,10 @@ RewriteRule ^api/latest_sessions/?$ api/latest_sessions.php [L]
 RewriteRule ^api/participants/?$ api/participants.php [L]
 RewriteRule ^api/conductor_sessions/?$ api/conductor_sessions.php [L]
 RewriteRule ^api/session_detail/?$ api/session_detail.php [L]
+RewriteRule ^api/stats/?$ api/stats.php [L]
+RewriteRule ^api/toggle_event_deletion/?$ api/toggle_event_deletion.php [L]
+
+
 
 # Rutas públicas
 RewriteRule ^login/?$ login.php [L]

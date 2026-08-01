@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/private/auth.php';
-require_once dirname(__DIR__, 2) . '/private/db.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
+require_once PROJECT_ROOT . '/private/auth.php';
+require_once PROJECT_ROOT . '/private/db.php';
+
 
 header('Content-Type: application/json; charset=utf-8');
 

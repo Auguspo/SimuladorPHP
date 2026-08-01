@@ -1,12 +1,14 @@
 <?php
-require_once dirname(__DIR__) . '/private/db.php';
+require_once __DIR__ . '/bootstrap.php';
+require_once PROJECT_ROOT . '/private/db.php';
+
 
 try {
     $pdo = db();
     $hash = password_hash('admin123', PASSWORD_DEFAULT);
     
     // Insertamos como 'master' según el ENUM
-    $stmt = $pdo->prepare("INSERT INTO users (name, password_hash, role) VALUES ('admin', :hash, 'master')");
+    $stmt = $pdo->prepare("INSERT INTO users (name, first_name, last_name, password_hash, role, is_active) VALUES ('admin', 'Administrador', 'Sistema', :hash, 'master', 1)");
     $stmt->execute(['hash' => $hash]);
     
     echo "<h1>¡Usuario admin creado con éxito!</h1>";

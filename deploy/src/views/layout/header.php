@@ -17,7 +17,6 @@
             <a href="/participantes" class="<?= ($activeMenu ?? '') === 'participantes' ? 'active' : '' ?>">Participantes</a>
             <a href="/estadisticas" class="<?= ($activeMenu ?? '') === 'estadisticas' ? 'active' : '' ?>">Estadísticas</a>
             <a href="/opciones" class="<?= ($activeMenu ?? '') === 'opciones' ? 'active' : '' ?>">Opciones</a>
-            <a href="/logout" class="logout">Salir</a>
         </nav>
     </div>
     <div class="container">

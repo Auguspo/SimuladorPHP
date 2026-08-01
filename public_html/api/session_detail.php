@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/private/auth.php';
-require_once dirname(__DIR__, 2) . '/private/db.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
+require_once PROJECT_ROOT . '/private/auth.php';
+require_once PROJECT_ROOT . '/private/db.php';
+
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -56,21 +58,31 @@ try {
         json_response(404, ['ok' => false, 'error' => 'Sesión no encontrada']);
     }
 
+    $deletedFilter = strtoupper(trim($_GET['deleted'] ?? 'N'));
+    $eventWhere = 'session_id = :session_id';
+    if ($deletedFilter === 'N') {
+        $eventWhere .= ' AND is_deleted = 0';
+    } elseif ($deletedFilter === 'Y') {
+        $eventWhere .= ' AND is_deleted = 1';
+    }
+
     $eventsStatement = $pdo->prepare(
-        'SELECT event_number, stimulus, result, time_ms
+        "SELECT id, event_number, stimulus, result, time_ms, is_deleted
          FROM session_events
-         WHERE session_id = :session_id
-         ORDER BY event_number ASC'
+         WHERE {$eventWhere}
+         ORDER BY event_number ASC"
     );
-    $eventsStatement->execute([':session_id' => $sessionId]);
+    $eventsStatement->execute([':session_id' => $session['id']]);
 
     $events = [];
     while ($eventRow = $eventsStatement->fetch(PDO::FETCH_ASSOC)) {
         $events[] = [
+            'id' => (int) $eventRow['id'],
             'event_number' => (int) $eventRow['event_number'],
             'stimulus' => $eventRow['stimulus'],
             'result' => $eventRow['result'],
             'time_ms' => (int) $eventRow['time_ms'],
+            'is_deleted' => !empty($eventRow['is_deleted']),
         ];
     }
 

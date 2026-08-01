@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/private/auth.php';
-require_once dirname(__DIR__, 2) . '/private/db.php';
+require_once dirname(__DIR__) . '/bootstrap.php';
+require_once PROJECT_ROOT . '/private/auth.php';
+require_once PROJECT_ROOT . '/private/db.php';
+
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -27,7 +29,7 @@ try {
          JOIN participants p ON p.id = s.participant_id
          LEFT JOIN clutch_metrics cm ON cm.session_id = s.id
          ORDER BY s.tested_at DESC, s.id DESC
-         LIMIT 20'
+         LIMIT 500'
     );
 
     $statement->execute();

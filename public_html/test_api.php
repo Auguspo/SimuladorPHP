@@ -1,5 +1,7 @@
 <?php
-require_once dirname(__DIR__) . '/private/db.php';
+require_once __DIR__ . '/bootstrap.php';
+require_once PROJECT_ROOT . '/private/db.php';
+
 session_start();
 $_SESSION['user_id'] = 1;
 session_write_close();
