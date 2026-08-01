@@ -1,67 +1,70 @@
-# Simulador de Telemetría (Backend PHP/MySQL)
+# Simulador de Telemetría PHP
 
-Este proyecto provee una arquitectura MVC para recibir, almacenar y visualizar métricas generadas por un simulador físico (ej. ESP32, Arduino) usando PHP y MySQL.
+Plataforma web para la gestión, análisis y monitoreo en tiempo real de pruebas de telemetría de conductores y tiempo de reacción.
 
-## Arquitectura del Proyecto
+---
 
-El sistema está dividido para mantener alta seguridad y separación de responsabilidades:
-- `public_html/`: Archivos expuestos al público (CSS, JS, Index).
-- `src/`: Lógica de la aplicación (Controladores y Vistas en HTML/CSS).
-- `private/`: Configuraciones críticas y conexión a base de datos (oculto al público).
-- `database/`: Scripts SQL de creación de base de datos.
+## 🌟 Características Principales
 
-## Instalación en una PC Limpia (Modo Local)
+1. **Gestión y Jerarquía de Usuarios (Roles & Seguridad)**
+   - **`master`**: Administrador del sistema con acceso total. No se puede asignar desde la interfaz.
+   - **`instructor`**: Puede crear usuarios, restablecer contraseñas, editar nombres/apellidos, alternar roles (`instructor` <-> `visualizador`), activar/desactivar accesos (`is_active`), ajustar umbrales de reacción y eliminar/restaurar eventos de prueba.
+   - **`visualizador`**: Rol de solo lectura para consulta de estadísticas y métricas sin permisos de modificación ni borrado de eventos.
+   - **Bloqueo Inteligente de Usuarios (`is_active`)**: Permite deshabilitar el acceso a un usuario sin destruir su hash de contraseña original.
 
-Gracias a Docker, puedes levantar el proyecto completo en cualquier PC sin necesidad de instalar PHP ni MySQL manualmente.
+2. **Configuración Dinámica de Umbrales de Reacción (0 a 8.000 ms)**
+   - Umbrales configurables desde la pestaña de **Configuración / Menú**:
+     - **Límite de Acierto / Rápido (`< ms`)**: Ej. 300 ms.
+     - **Límite de Fallo / Lento (`> ms`)**: Ej. 450 ms.
+     - **Timeout del Sistema**: Fijado en 8.000 ms (8 seg).
+     - Validación estricta: Los límites de acierto y fallo no pueden ser iguales.
 
-1. **Requisitos:** Tener instalado **Docker Desktop** (y tenerlo abierto/corriendo).
-2. Abre una terminal en la carpeta principal del proyecto.
-3. Ejecuta el comando para encender el servidor y la base de datos:
-   ```bash
-   docker compose up -d
-   ```
-4. **Crear usuario administrador:**
-   La primera vez que levantas el proyecto, la base de datos estará vacía. Para crear el usuario por defecto, abre tu navegador y entra a:
-   `http://localhost:8080/crear_admin`
-   *(Esto creará un usuario `admin` con contraseña `admin123` y luego el archivo se autodestruirá por seguridad).*
+3. **Borrado Lógico y Restauración de Eventos (`is_deleted`)**
+   - Los instructores y masters pueden descartar (`is_deleted = true`) o revivir/restaurar (`is_deleted = false`) eventos individuales por sesión.
+   - Filtro de eventos desplegable:
+     - **N (Vigentes - Predeterminado)**: Computa solo eventos válidos.
+     - **Y (Solo Borrados)**: Muestra eventos marcados como eliminados.
+     - **ALL (Todos)**: Incluye la totalidad de los eventos destacando visualmente los tachados.
 
-5. **Acceder a la Base de Datos (phpMyAdmin):**
-   Tu entorno local ya incluye phpMyAdmin para visualizar y editar las tablas gráficamente.
-   - **URL:** `http://localhost:8081`
-   - **Usuario:** `root`
-   - **Contraseña:** `root_password`
+4. **Formatos Regionales de Argentina (Fechas y Decimales)**
+   - Fechas formateadas como **`DD/MM/YYYY`** (ej. `01/08/2026`).
+   - Formato numérico con **coma decimal `,`** (ej. `14,7`, `14,42 s`, `83,3%`).
 
-## Cómo probar el Endpoint de Telemetría
+5. **Navegación e Interfaz de Usuario (UX/UI)**
+   - **Ordenamiento Interactivo de Columnas (3 Estados)**: Clic en cabeceras para alternar entre `Ascendente (▲)`, `Descendente (▼)` y `Por Defecto (↕)`.
+   - **Paginación Dinámica (50 ítems por página por defecto)**: Selector desplegable (`10`, `25`, `50`, `100` ítems) con navegación de páginas.
+   - **Minificación al Vuelo de HTML**: Compresión automática en servidor via `ob_start` manteniendo el código fuente 100% limpio y legible para desarrollo/depuración.
+   - **Diseño Mobile Responsive**: Adaptable a smartphones, tablets y pantallas de escritorio sin franjas laterales desbordadas.
 
-Una vez que el proyecto esté corriendo localmente, el servidor **no bloqueará las peticiones de tu simulador** (a diferencia de hostings gratuitos como InfinityFree que inyectan validaciones JavaScript).
+---
 
-### 1. Enviar datos desde tu Simulador (Placa Física / ESP32)
-Si tu ESP32 está conectado al mismo WiFi que la computadora donde corre Docker, no puedes usar `localhost`. Debes apuntarlo a la IP local de tu PC:
-- **Endpoint URL:** `http://192.168.1.X:8080/api/telemetry` *(Reemplaza la X por tu IP real)*.
-- **Método:** `POST`
-- **Header:** `Authorization: 123`
-- **Body:** JSON con los datos.
+## 🛠️ Requisitos e Instalación Local (Docker)
 
-### 2. Prueba Rápida desde PowerShell (Misma PC)
-Para confirmar rápidamente que el sistema inserta bien en la base de datos, puedes correr este script en PowerShell:
+```bash
+# 1. Clonar el repositorio
+git clone <URL_DEL_REPOSITORIO>
+cd SimuladorPHP
 
-```powershell
-$body = @{
-    external_id = "sesion_test_001"
-    tested_at = "2026-07-24 10:00:00"
-    conductor = "Piloto Prueba"
-    events = @(
-        @{ timestamp = "2026-07-24 10:00:01"; input_type = "throttle"; value = 1.0 },
-        @{ timestamp = "2026-07-24 10:00:03"; input_type = "brake"; value = 1.0 }
-    )
-} | ConvertTo-Json -Depth 10
+# 2. Levantar el entorno en Docker (PHP 8.2 + MySQL 8.0 + Nginx)
+docker compose up -d --build
 
-Invoke-RestMethod `
-    -Uri "http://localhost:8080/api/telemetry" `
-    -Method Post `
-    -Headers @{"Authorization" = "123"} `
-    -ContentType "application/json" `
-    -Body $body
+# 3. Acceder en el navegador
+http://localhost:8080/
 ```
 
-Si todo va bien, te responderá confirmando la subida y podrás ver la sesión en tu panel web entrando a `http://localhost:8080`.
+---
+
+## 🗄️ Estructura de la Base de Datos y Migraciones
+
+La base de datos incluye las tablas: `users`, `participants`, `sessions`, `session_events`, `clutch_metrics` y `system_settings`.
+
+### Scripts de Migración en `/database`:
+- `database/schema.sql`: Estructura inicial completa del sistema.
+- `database/update_users_table.sql`: Migración de usuarios (`first_name`, `last_name`, `is_active`).
+- `database/update_events_and_settings.sql`: Migración de borrado lógico (`is_deleted`) y tabla `system_settings`.
+
+---
+
+## 🚀 Despliegue en Hostinger
+
+Consulta la guía detallada de despliegue en [README_HOSTINGER.md](README_HOSTINGER.md).
