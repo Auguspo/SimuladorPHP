@@ -8,8 +8,11 @@ CREATE TABLE users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     role ENUM('master', 'instructor', 'visualizador') NOT NULL,
     name VARCHAR(120) NOT NULL,
+    first_name VARCHAR(120) NOT NULL DEFAULT '',
+    last_name VARCHAR(120) NOT NULL DEFAULT '',
     dni VARCHAR(30) NULL,
     password_hash VARCHAR(255) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_users_dni (dni),
@@ -56,6 +59,7 @@ CREATE TABLE session_events (
     stimulus VARCHAR(80) NOT NULL,
     result ENUM('ACIERTO', 'ERROR') NOT NULL,
     time_ms INT UNSIGNED NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_session_events_number (session_id, event_number),
     CONSTRAINT fk_session_events_session
@@ -80,3 +84,16 @@ CREATE TABLE clutch_metrics (
     CHECK (count <= 1000000),
     CHECK (total_time_s >= 0 AND total_time_s <= 86400)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE system_settings (
+    setting_key VARCHAR(50) PRIMARY KEY,
+    setting_value VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO system_settings (setting_key, setting_value) VALUES
+('fast_threshold_ms', '300'),
+('slow_threshold_ms', '450'),
+('max_timeout_ms', '8000')
+ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);
+
