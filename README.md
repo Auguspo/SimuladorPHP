@@ -1,70 +1,31 @@
-# Simulador de Telemetría PHP
+# Simulador de Manejo Defensivo - Backend y API (PHP)
 
-Plataforma web para la gestión, análisis y monitoreo en tiempo real de pruebas de telemetría de conductores y tiempo de reacción.
+Este repositorio contiene el backend, la base de datos y la interfaz de supervisión del **Simulador de Manejo Defensivo**. Está diseñado para recibir telemetría de una placa ESP32, guardar el registro histórico de los conductores, y presentar las estadísticas en un panel de control web.
 
----
+## 🚀 Arquitectura
 
-## 🌟 Características Principales
+El proyecto está desarrollado en **PHP puro (Vanilla)** sin frameworks pesados, asegurando máxima velocidad de respuesta y fácil despliegue en cualquier hosting compartido o servidor local (Apache/Nginx).
 
-1. **Gestión y Jerarquía de Usuarios (Roles & Seguridad)**
-   - **`master`**: Administrador del sistema con acceso total. No se puede asignar desde la interfaz.
-   - **`instructor`**: Puede crear usuarios, restablecer contraseñas, editar nombres/apellidos, alternar roles (`instructor` <-> `visualizador`), activar/desactivar accesos (`is_active`), ajustar umbrales de reacción y eliminar/restaurar eventos de prueba.
-   - **`visualizador`**: Rol de solo lectura para consulta de estadísticas y métricas sin permisos de modificación ni borrado de eventos.
-   - **Bloqueo Inteligente de Usuarios (`is_active`)**: Permite deshabilitar el acceso a un usuario sin destruir su hash de contraseña original.
+La estructura de carpetas sigue el principio de seguridad donde la lógica crítica se encuentra fuera del alcance público:
 
-2. **Configuración Dinámica de Umbrales de Reacción (0 a 8.000 ms)**
-   - Umbrales configurables desde la pestaña de **Configuración / Menú**:
-     - **Límite de Acierto / Rápido (`< ms`)**: Ej. 300 ms.
-     - **Límite de Fallo / Lento (`> ms`)**: Ej. 450 ms.
-     - **Timeout del Sistema**: Fijado en 8.000 ms (8 seg).
-     - Validación estricta: Los límites de acierto y fallo no pueden ser iguales.
+*   **`public_html/`**: Carpeta raíz del servidor web (Document Root). Contiene los puntos de entrada accesibles públicamente, vistas, CSS/JS y el enrutador principal (`.htaccess`).
+*   **`public_html/api/`**: Endpoints RESTful de uso exclusivo para la ESP32 (ingesta de datos) y consumo interno de Ajax (estadísticas).
+*   **`private/`**: Archivos de configuración, conexión a la base de datos y control de sesión (rutas no expuestas).
+*   **`database/`**: Scripts SQL con el esquema de la base de datos (tablas `users`, `participants`, `sessions`, `session_events`, `clutch_metrics`).
 
-3. **Borrado Lógico y Restauración de Eventos (`is_deleted`)**
-   - Los instructores y masters pueden descartar (`is_deleted = true`) o revivir/restaurar (`is_deleted = false`) eventos individuales por sesión.
-   - Filtro de eventos desplegable:
-     - **N (Vigentes - Predeterminado)**: Computa solo eventos válidos.
-     - **Y (Solo Borrados)**: Muestra eventos marcados como eliminados.
-     - **ALL (Todos)**: Incluye la totalidad de los eventos destacando visualmente los tachados.
+## ✨ Características Principales
 
-4. **Formatos Regionales de Argentina (Fechas y Decimales)**
-   - Fechas formateadas como **`DD/MM/YYYY`** (ej. `01/08/2026`).
-   - Formato numérico con **coma decimal `,`** (ej. `14,7`, `14,42 s`, `83,3%`).
+-   **Ingesta Segura:** El endpoint `/api/telemetry` valida estrictamente el JSON entrante de la ESP32 (verificando tipos de datos, límites de rango y estímulos permitidos) antes de insertar los datos usando *Prepared Statements* (PDO) dentro de una transacción, evitando cualquier tipo de inyección SQL o corrupción de datos.
+-   **Enrutamiento Limpio:** Uso de mod_rewrite en `.htaccess` para generar URLs amigables (ej. `/login`, `/estadisticas`) sin exponer extensiones `.php`.
+-   **Minificación al Vuelo:** El archivo `bootstrap.php` implementa un *Output Buffer* que limpia y minifica el HTML antes de enviarlo al navegador del usuario, reduciendo el consumo de ancho de banda.
+-   **Seguridad y Autenticación:** Control de acceso mediante variables de sesión. Protección de los endpoints de la API mediante un token `Bearer`.
 
-5. **Navegación e Interfaz de Usuario (UX/UI)**
-   - **Ordenamiento Interactivo de Columnas (3 Estados)**: Clic en cabeceras para alternar entre `Ascendente (▲)`, `Descendente (▼)` y `Por Defecto (↕)`.
-   - **Paginación Dinámica (50 ítems por página por defecto)**: Selector desplegable (`10`, `25`, `50`, `100` ítems) con navegación de páginas.
-   - **Minificación al Vuelo de HTML**: Compresión automática en servidor via `ob_start` manteniendo el código fuente 100% limpio y legible para desarrollo/depuración.
-   - **Diseño Mobile Responsive**: Adaptable a smartphones, tablets y pantallas de escritorio sin franjas laterales desbordadas.
+## 🛠️ Instalación y Despliegue
 
----
+1.  **Requisitos:** PHP 8.0+ y MySQL/MariaDB.
+2.  **Base de Datos:** Importa el archivo `database/schema.sql` en tu gestor de base de datos MySQL.
+3.  **Configuración:** Configura las credenciales de la base de datos en `private/config.php` o crea un archivo `.env` en la raíz del proyecto.
+4.  **Servidor Web:** Configura tu Apache/Nginx para que el `DocumentRoot` apunte a la carpeta `public_html/`.
 
-## 🛠️ Requisitos e Instalación Local (Docker)
-
-```bash
-# 1. Clonar el repositorio
-git clone <URL_DEL_REPOSITORIO>
-cd SimuladorPHP
-
-# 2. Levantar el entorno en Docker (PHP 8.2 + MySQL 8.0 + Nginx)
-docker compose up -d --build
-
-# 3. Acceder en el navegador
-http://localhost:8080/
-```
-
----
-
-## 🗄️ Estructura de la Base de Datos y Migraciones
-
-La base de datos incluye las tablas: `users`, `participants`, `sessions`, `session_events`, `clutch_metrics` y `system_settings`.
-
-### Scripts de Migración en `/database`:
-- `database/schema.sql`: Estructura inicial completa del sistema.
-- `database/update_users_table.sql`: Migración de usuarios (`first_name`, `last_name`, `is_active`).
-- `database/update_events_and_settings.sql`: Migración de borrado lógico (`is_deleted`) y tabla `system_settings`.
-
----
-
-## 🚀 Despliegue en Hostinger
-
-Consulta la guía detallada de despliegue en [README_HOSTINGER.md](README_HOSTINGER.md).
+## 🔒 Seguridad
+Se han eliminado los scripts de prueba públicos y se ha forzado un enrutamiento que protege los archivos base. Asegúrate de modificar el usuario maestro generado en la base de datos para utilizar una contraseña fuerte.
