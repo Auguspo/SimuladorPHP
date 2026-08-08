@@ -169,6 +169,11 @@ try {
     $participantAge = optional_uint($participant, 'edad', 120);
     $participantWeight = optional_decimal($participant, 'peso', 300);
     $participantComment = optional_string($participant, 'comentario', 65535);
+    $tractionMode = required_string($participant, 'modo_traccion', 20);
+
+    if (!in_array($tractionMode, ['2H', '4H', '4L', 'Indefinido'], true)) {
+        json_response(400, ['ok' => false, 'error' => 'modo_traccion invalido']);
+    }
 
     $clutch = required_array($session, 'embrague');
     $clutchCount = required_uint($clutch, 'conteo', 1000000);
@@ -188,9 +193,18 @@ try {
             json_response(400, ['ok' => false, 'error' => 'resultado debe ser ACIERTO o ERROR']);
         }
 
+        $stimulus = required_string($event, 'estimulo', 80);
+        $validStimuli = [
+            'Freno (LED)', 'Acelerador (LED)', 'Freno (Bocina)', 'Acelerador (Bocina)',
+            'Boton 1', 'Boton 2', 'Boton 3', 'Boton 4', '-'
+        ];
+        if (!in_array($stimulus, $validStimuli, true)) {
+            json_response(400, ['ok' => false, 'error' => "estimulo invalido: $stimulus"]);
+        }
+
         $normalizedEvents[] = [
             'number' => required_uint($event, 'numero', 1000000),
-            'stimulus' => required_string($event, 'estimulo', 80),
+            'stimulus' => $stimulus,
             'result' => $result,
             'time_ms' => required_uint($event, 'tiempo_ms', 600000),
         ];
@@ -212,9 +226,9 @@ try {
 
     $statement = $pdo->prepare(
         'INSERT INTO sessions (
-             external_id, participant_id, tested_at, participant_age, participant_weight_kg, participant_comment
+             external_id, participant_id, tested_at, participant_age, participant_weight_kg, participant_comment, traction_mode
          ) VALUES (
-             :external_id, :participant_id, :tested_at, :participant_age, :participant_weight_kg, :participant_comment
+             :external_id, :participant_id, :tested_at, :participant_age, :participant_weight_kg, :participant_comment, :traction_mode
          )'
     );
     $statement->execute([
@@ -224,6 +238,7 @@ try {
         ':participant_age' => $participantAge,
         ':participant_weight_kg' => $participantWeight,
         ':participant_comment' => $participantComment,
+        ':traction_mode' => $tractionMode,
     ]);
     $sessionId = (int) $pdo->lastInsertId();
 

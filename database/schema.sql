@@ -39,6 +39,7 @@ CREATE TABLE sessions (
     participant_age TINYINT UNSIGNED NULL,
     participant_weight_kg DECIMAL(5,2) NULL,
     participant_comment TEXT NULL,
+    traction_mode ENUM('2H', '4H', '4L', 'Indefinido') NOT NULL DEFAULT 'Indefinido',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_sessions_external_id (external_id),
@@ -56,7 +57,7 @@ CREATE TABLE session_events (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     session_id BIGINT UNSIGNED NOT NULL,
     event_number INT UNSIGNED NOT NULL,
-    stimulus VARCHAR(80) NOT NULL,
+    stimulus ENUM('Freno (LED)', 'Acelerador (LED)', 'Freno (Bocina)', 'Acelerador (Bocina)', 'Boton 1', 'Boton 2', 'Boton 3', 'Boton 4', '-') NOT NULL,
     result ENUM('ACIERTO', 'ERROR') NOT NULL,
     time_ms INT UNSIGNED NOT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -66,7 +67,6 @@ CREATE TABLE session_events (
         FOREIGN KEY (session_id) REFERENCES sessions (id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    CHECK (stimulus <> ''),
     CHECK (time_ms <= 600000)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
