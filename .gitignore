@@ -1,3 +1,4 @@
 .env
 simulador_deploy.zip
 *.log
+sftp.json

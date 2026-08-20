@@ -1,7 +1,13 @@
 <?php
 
 if (!defined('PROJECT_ROOT')) {
-    require_once dirname(__DIR__, 2) . '/public_html/bootstrap.php';
+    $local_bootstrap = dirname(__DIR__, 2) . '/public_html/bootstrap.php';
+    $deploy_bootstrap = dirname(__DIR__, 2) . '/bootstrap.php';
+    if (file_exists($local_bootstrap)) {
+        require_once $local_bootstrap;
+    } else {
+        require_once $deploy_bootstrap;
+    }
 }
 require_once PROJECT_ROOT . '/private/db.php';
 

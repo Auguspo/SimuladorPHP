@@ -23,6 +23,7 @@ try {
              p.dni AS participant_dni,
              cm.count AS clutch_count,
              cm.total_time_s AS clutch_total_time_s,
+             s.instructor_score,
              (SELECT COUNT(*) FROM session_events se WHERE se.session_id = s.id) AS events_count,
              (SELECT SUM(time_ms) FROM session_events se WHERE se.session_id = s.id) AS total_reaction_ms
          FROM sessions s
@@ -45,6 +46,7 @@ try {
             'participant_age' => $row['participant_age'] !== null ? (int) $row['participant_age'] : null,
             'participant_weight_kg' => $row['participant_weight_kg'] !== null ? (float) $row['participant_weight_kg'] : null,
             'participant_comment' => $row['participant_comment'],
+            'instructor_score' => $row['instructor_score'] !== null ? (int) $row['instructor_score'] : null,
             'clutch_count' => $row['clutch_count'] !== null ? (int) $row['clutch_count'] : null,
             'clutch_total_time_s' => $row['clutch_total_time_s'] !== null ? (float) $row['clutch_total_time_s'] : null,
             'events_count' => (int) $row['events_count'],

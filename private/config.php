@@ -41,11 +41,11 @@ if (!function_exists('loadEnvFile')) {
 loadEnvFile(__DIR__ . '/.env');
 loadEnvFile(dirname(__DIR__) . '/.env');
 
-define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_NAME', getenv('DB_NAME') ?: 'simulador_db');
-define('DB_USER', getenv('DB_USER') ?: 'admin_user');
-define('DB_PASS', getenv('DB_PASS') ?: 'admin_password');
-define('DB_CHARSET', getenv('DB_CHARSET') ?: 'utf8mb4');
+define('DB_HOST', $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'simulador_db');
+define('DB_USER', $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'root');
+define('DB_PASS', $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '');
+define('DB_CHARSET', $_ENV['DB_CHARSET'] ?? getenv('DB_CHARSET') ?: 'utf8mb4');
 
 // Token compartido simple para ESP32 u otros clientes
 define('API_TOKEN', getenv('API_TOKEN') ?: '123');

@@ -19,11 +19,11 @@ require __DIR__ . '/layout/header.php';
             Filtros de Análisis
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
-            <div>
-                <label for="filterParticipant" style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">Conductor / Participante</label>
-                <select id="filterParticipant" onchange="applyStatsFilters()">
-                    <option value="">Cargando participantes...</option>
-                </select>
+            <div style="position: relative;">
+                <label for="filterParticipantName" style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">Conductor / Participante</label>
+                <input type="text" id="filterParticipantName" placeholder="Buscar nombre o DNI..." autocomplete="off" >
+                <div id="participantDropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border: 1px solid var(--border); border-radius: 6px; max-height: 200px; overflow-y: auto; z-index: 100; margin-top: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);"></div>
+                <input type="hidden" id="filterParticipantId">
             </div>
             <div>
                 <label for="filterFrom" style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">Fecha Desde</label>
@@ -42,7 +42,7 @@ require __DIR__ . '/layout/header.php';
                 </select>
             </div>
             <div>
-                <button type="button" class="btn btn-secondary btn-block btn-sm" onclick="clearFilters()" style="padding: 0.65rem 1rem;">Limpiar Filtros</button>
+                <!-- <button type="button" class="btn btn-secondary btn-block btn-sm" onclick="clearFilters()" style="padding: 0.65rem 1rem;">Limpiar Filtros</button> -->
             </div>
         </div>
     </div>

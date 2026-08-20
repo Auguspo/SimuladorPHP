@@ -23,60 +23,42 @@ try {
     }
 
     $pdo = db();
-    $query = 
-        'SELECT
-             s.id,
-             s.external_id,
-             s.tested_at,
-             s.participant_age,
-             s.participant_weight_kg,
-             s.participant_comment,
-             s.traction_mode,
-             p.name AS participant_name,
-             p.dni AS participant_dni,
-             cm.count AS clutch_count,
-             cm.total_time_s AS clutch_total_time_s
-         FROM sessions s
-         JOIN participants p ON p.id = s.participant_id
-         LEFT JOIN clutch_metrics cm ON cm.session_id = s.id
-         WHERE ';
+    
+    $deletedFilter = strtoupper(trim($_GET['deleted'] ?? 'N'));
 
-    if (ctype_digit($sessionId)) {
-        $query .= 's.id = :session_id OR s.external_id = :external_id';
-        $statement = $pdo->prepare($query);
-        $statement->execute([
-            ':session_id' => (int) $sessionId,
-            ':external_id' => $sessionId,
-        ]);
-    } else {
-        $query .= 's.external_id = :external_id';
-        $statement = $pdo->prepare($query);
-        $statement->execute([':external_id' => $sessionId]);
-    }
-    $session = $statement->fetch(PDO::FETCH_ASSOC);
+    $stmt = $pdo->prepare('
+        SELECT s.id, s.external_id, s.tested_at, s.participant_age, s.participant_weight_kg, s.participant_comment, s.instructor_score,
+               p.name AS participant_name, p.dni AS participant_dni,
+               c.count AS clutch_count, c.total_time_s AS clutch_total_time_s
+        FROM sessions s
+        JOIN participants p ON s.participant_id = p.id
+        LEFT JOIN clutch_metrics c ON s.id = c.session_id
+        WHERE s.id = :id OR s.external_id = :external_id
+    ');
+    
+    // Si $sessionId es numerico lo usamos para :id, de lo contrario :id = 0
+    $idInt = ctype_digit($sessionId) ? (int)$sessionId : 0;
+    
+    $stmt->execute([':id' => $idInt, ':external_id' => $sessionId]);
+    $session = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$session) {
-        json_response(404, ['ok' => false, 'error' => 'Sesión no encontrada']);
+        json_response(404, ['ok' => false, 'error' => 'Sesion no encontrada']);
     }
 
-    $deletedFilter = strtoupper(trim($_GET['deleted'] ?? 'N'));
-    $eventWhere = 'session_id = :session_id';
+    $eventsQuery = 'SELECT id, event_number, stimulus, result, time_ms, is_deleted, traction_mode FROM session_events WHERE session_id = :session_id';
     if ($deletedFilter === 'N') {
-        $eventWhere .= ' AND is_deleted = 0';
+        $eventsQuery .= ' AND is_deleted = 0';
     } elseif ($deletedFilter === 'Y') {
-        $eventWhere .= ' AND is_deleted = 1';
+        $eventsQuery .= ' AND is_deleted = 1';
     }
+    $eventsQuery .= ' ORDER BY event_number ASC';
 
-    $eventsStatement = $pdo->prepare(
-        "SELECT id, event_number, stimulus, result, time_ms, is_deleted
-         FROM session_events
-         WHERE {$eventWhere}
-         ORDER BY event_number ASC"
-    );
-    $eventsStatement->execute([':session_id' => $session['id']]);
-
+    $stmtEvents = $pdo->prepare($eventsQuery);
+    $stmtEvents->execute([':session_id' => $session['id']]);
+    
     $events = [];
-    while ($eventRow = $eventsStatement->fetch(PDO::FETCH_ASSOC)) {
+    while ($eventRow = $stmtEvents->fetch(PDO::FETCH_ASSOC)) {
         $events[] = [
             'id' => (int) $eventRow['id'],
             'event_number' => (int) $eventRow['event_number'],
@@ -84,6 +66,7 @@ try {
             'result' => $eventRow['result'],
             'time_ms' => (int) $eventRow['time_ms'],
             'is_deleted' => !empty($eventRow['is_deleted']),
+            'traction_mode' => $eventRow['traction_mode'],
         ];
     }
 
@@ -96,7 +79,7 @@ try {
         'participant_age' => $session['participant_age'] !== null ? (int) $session['participant_age'] : null,
         'participant_weight_kg' => $session['participant_weight_kg'] !== null ? (float) $session['participant_weight_kg'] : null,
         'participant_comment' => $session['participant_comment'],
-        'traction_mode' => $session['traction_mode'],
+        'instructor_score' => $session['instructor_score'] !== null ? (int) $session['instructor_score'] : null,
         'clutch_count' => $session['clutch_count'] !== null ? (int) $session['clutch_count'] : null,
         'clutch_total_time_s' => $session['clutch_total_time_s'] !== null ? (float) $session['clutch_total_time_s'] : null,
         'events' => $events,

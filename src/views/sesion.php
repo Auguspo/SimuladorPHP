@@ -12,15 +12,56 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
         <h1 style="margin: 0;">Detalle de Sesión</h1>
-        <a href="javascript:history.back()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-            ← Volver
-        </a>
+        <div style="display: flex; gap: 0.5rem;" id="header-buttons">
+            <a href="javascript:history.back()" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                ← Volver
+            </a>
+            <!-- Botón de exportar a PDF -->
+            <button class="btn btn-secondary btn-sm" onclick="window.print()" style="display: flex; align-items: center; gap: 0.4rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Exportar PDF
+            </button>
+            <!-- Botón de editar (se muestra por JS si tiene permisos) -->
+            <button id="btnEditSession" class="btn btn-primary btn-sm" style="display: none;" onclick="openEditModal()">
+                Editar Datos
+            </button>
+        </div>
     </div>
     
     <p class="status" id="status" style="color: var(--text-muted); font-size: 0.875rem;">Cargando sesión...</p>
     <div id="content"></div>
 </div>
 
-<script src="/js/sesion.js?v=3"></script>
+<!-- Modal para editar la sesión -->
+<div id="editSessionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="card" style="width: 100%; max-width: 500px; margin: 20px;">
+        <h2 style="margin-top: 0; font-size: 1.25rem;">Editar Detalles de Sesión</h2>
+        <form id="editSessionForm" onsubmit="submitEditSession(event)">
+            <input type="hidden" id="editSessionId">
+            <div class="form-group">
+                <label>Edad</label>
+                <input type="number" id="editAge" style="width: 100%; background: rgba(15,23,42,0.7); border: 1px solid var(--border); padding: 8px; color: white;">
+            </div>
+            <div class="form-group">
+                <label>Peso (kg)</label>
+                <input type="number" step="0.1" id="editWeight" style="width: 100%; background: rgba(15,23,42,0.7); border: 1px solid var(--border); padding: 8px; color: white;">
+            </div>
+            <div class="form-group">
+                <label>Puntaje Sesion</label>
+                <input type="number" id="editScore" placeholder="Ej: 10" style="width: 100%; background: rgba(15,23,42,0.7); border: 1px solid var(--border); padding: 8px; color: white;">
+            </div>
+            <div class="form-group">
+                <label>Comentarios</label>
+                <textarea id="editComment" rows="4" style="width: 100%; background: rgba(15,23,42,0.7); border: 1px solid var(--border); padding: 8px; color: white; resize: vertical;"></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/sesion.js?v=4"></script>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>

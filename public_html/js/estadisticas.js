@@ -3,33 +3,94 @@ async function initStatsPage() {
     await loadStats();
 }
 
-async function loadParticipantsDropdown() {
-    const select = document.getElementById('filterParticipant');
-    if (!select) return;
+let allParticipants = [];
 
+async function loadParticipantsDropdown() {
     try {
         const response = await fetch('/api/participants');
-        if (!response.ok) return;
-
         const json = await response.json();
         if (json.ok && Array.isArray(json.participants)) {
-            let options = '<option value="">Todos los conductores</option>';
-            json.participants.forEach(p => {
-                options += `<option value="${p.id}">${escapeHtml(p.name)} (${escapeHtml(p.dni)})</option>`;
-            });
-            select.innerHTML = options;
-        } else {
-            select.innerHTML = '<option value="">Todos los conductores</option>';
+            allParticipants = json.participants;
         }
     } catch (e) {
-        console.error('Error al cargar participantes en filtro:', e);
-        select.innerHTML = '<option value="">Todos los conductores</option>';
+        console.error('Error al cargar participantes:', e);
     }
 }
 
+function renderParticipantDropdown(query = '') {
+    const dropdown = document.getElementById('participantDropdown');
+    const input = document.getElementById('filterParticipantName');
+    if (!dropdown || !input) return;
+
+    dropdown.innerHTML = '';
+    
+    if (query.trim() === '') {
+        dropdown.style.display = 'none';
+        return;
+    }
+
+    const lowerQuery = query.toLowerCase();
+    const filtered = allParticipants.filter(p => 
+        p.name.toLowerCase().includes(lowerQuery) || 
+        String(p.dni).toLowerCase().includes(lowerQuery)
+    );
+
+    if (filtered.length === 0) {
+        dropdown.innerHTML = '<div style="padding: 0.6rem 0.75rem; color: var(--text-muted); font-size: 0.85rem;">No se encontraron resultados</div>';
+    } else {
+        filtered.forEach(p => {
+            const div = document.createElement('div');
+            div.style.padding = '0.6rem 0.75rem';
+            div.style.cursor = 'pointer';
+            div.style.fontSize = '0.85rem';
+            div.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+            div.innerHTML = `<b style="color: white;">${escapeHtml(p.name)}</b> <span style="color: var(--text-muted); font-size: 0.75rem; margin-left: 0.5rem;">DNI: ${escapeHtml(p.dni)}</span>`;
+            
+            div.onmouseover = () => div.style.background = 'rgba(59, 130, 246, 0.2)';
+            div.onmouseout = () => div.style.background = 'transparent';
+            
+            div.onclick = () => {
+                input.value = p.name;
+                document.getElementById('filterParticipantId').value = p.id;
+                dropdown.style.display = 'none';
+                applyStatsFilters();
+            };
+            dropdown.appendChild(div);
+        });
+    }
+    dropdown.style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('filterParticipantName');
+    if (input) {
+        input.addEventListener('input', (e) => {
+            document.getElementById('filterParticipantId').value = '';
+            renderParticipantDropdown(e.target.value);
+            if (e.target.value === '') {
+                applyStatsFilters();
+            }
+        });
+
+        input.addEventListener('focus', (e) => {
+            if (e.target.value.trim() !== '') {
+                renderParticipantDropdown(e.target.value);
+            }
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        const input = document.getElementById('filterParticipantName');
+        const dropdown = document.getElementById('participantDropdown');
+        if (input && dropdown && !e.target.closest('#filterParticipantName') && !e.target.closest('#participantDropdown')) {
+            dropdown.style.display = 'none';
+        }
+    });
+});
+
 async function loadStats() {
     const container = document.getElementById('stats-container');
-    const participantId = document.getElementById('filterParticipant')?.value || '';
+    const participantId = document.getElementById('filterParticipantId')?.value || '';
     const fromDate = document.getElementById('filterFrom')?.value || '';
     const toDate = document.getElementById('filterTo')?.value || '';
     const deletedFilter = document.getElementById('filterDeleted')?.value || 'N';
@@ -67,12 +128,14 @@ function applyStatsFilters() {
 }
 
 function clearFilters() {
-    const participantSelect = document.getElementById('filterParticipant');
+    const participantName = document.getElementById('filterParticipantName');
+    const participantId = document.getElementById('filterParticipantId');
     const fromInput = document.getElementById('filterFrom');
     const toInput = document.getElementById('filterTo');
     const deletedSelect = document.getElementById('filterDeleted');
 
-    if (participantSelect) participantSelect.value = '';
+    if (participantName) participantName.value = '';
+    if (participantId) participantId.value = '';
     if (fromInput) fromInput.value = '';
     if (toInput) toInput.value = '';
     if (deletedSelect) deletedSelect.value = 'N';
@@ -224,11 +287,11 @@ function renderLeaderboard(drivers) {
 
         return `
             <tr>
-                <td><b>${medal}</b> ${escapeHtml(d.name)}</td>
-                <td>${d.sessions_count}</td>
-                <td><b style="color: #a78bfa;">${avg} ms</b></td>
-                <td><span style="color: #34d399;">${best} ms</span></td>
-                <td><span class="badge ${parseFloat(d.accuracy_pct) >= 80 ? 'badge-active' : 'badge-blocked'}">${acc}%</span></td>
+                <td data-label="Conductor"><b>${medal}</b> ${escapeHtml(d.name)}</td>
+                <td data-label="Pruebas">${d.sessions_count}</td>
+                <td data-label="Avg (ms)"><b style="color: #a78bfa;">${avg} ms</b></td>
+                <td data-label="Mín (ms)"><span style="color: #34d399;">${best} ms</span></td>
+                <td data-label="Precisión"><span class="badge ${parseFloat(d.accuracy_pct) >= 80 ? 'badge-active' : 'badge-blocked'}">${acc}%</span></td>
             </tr>
         `;
     }).join('');
@@ -248,10 +311,10 @@ function renderStimulusBreakdown(list) {
 
         return `
             <tr>
-                <td><b>${escapeHtml(s.stimulus)}</b></td>
-                <td>${count}</td>
-                <td><b style="color: #60a5fa;">${avg} ms</b></td>
-                <td><span class="badge ${pctVal >= 80 ? 'badge-active' : 'badge-blocked'}">${aciertos}/${count} (${pctStr}%)</span></td>
+                <td data-label="Estímulo"><b>${escapeHtml(s.stimulus)}</b></td>
+                <td data-label="Evaluaciones">${count}</td>
+                <td data-label="Promedio (ms)"><b style="color: #60a5fa;">${avg} ms</b></td>
+                <td data-label="Aciertos"><span class="badge ${pctVal >= 80 ? 'badge-active' : 'badge-blocked'}">${aciertos}/${count} (${pctStr}%)</span></td>
             </tr>
         `;
     }).join('');

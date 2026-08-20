@@ -50,7 +50,7 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
         <button type="button" class="tab-btn active" onclick="switchTab('profileTab', this)">Mi Perfil</button>
         <?php if ($canManageUsers): ?>
             <button type="button" class="tab-btn" onclick="switchTab('usersTab', this)">Gestión de Usuarios (<?= count($allUsersList ?? []) ?>)</button>
-            <button type="button" class="tab-btn" onclick="switchTab('settingsTab', this)">Límites de Reacción</button>
+            <!-- <button type="button" class="tab-btn" onclick="switchTab('settingsTab', this)">Límites de Reacción</button> -->
         <?php endif; ?>
     </div>
 
@@ -196,7 +196,7 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
                     <th>Nombre Completo</th>
                     <th>Usuario</th>
                     <th>Rol / Permiso</th>
-                    <th>Estado (`is_active`)</th>
+                    <th>Estado</th>
                     <th style="text-align: right;">Acciones</th>
                 </tr>
             </thead>
@@ -232,9 +232,9 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
                         </td>
                         <td>
                             <?php if ($isActive): ?>
-                                <span class="badge badge-active">Activo (True)</span>
+                                <span class="badge badge-active">Activo</span>
                             <?php else: ?>
-                                <span class="badge badge-blocked">Bloqueado (False)</span>
+                                <span class="badge badge-blocked">Bloqueado</span>
                             <?php endif; ?>
                         </td>
                         <td style="text-align: right;">
@@ -274,7 +274,7 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
     <?php endif; ?>
 
     <!-- PESTAÑA 3: LÍMITES DE REACCIÓN -->
-    <?php if ($canManageUsers): ?>
+    <!-- <?php if ($canManageUsers): ?>
     <div id="settingsTab" class="tab-content" style="display: none;">
         <h3 style="margin-top: 0; color: var(--text-main); font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
             Configuración de Umbrales de Reacción (0 a 8.000 ms)
@@ -308,7 +308,7 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
             </div>
         </form>
     </div>
-    <?php endif; ?>
+    <?php endif; ?> -->
 
 </div>
 

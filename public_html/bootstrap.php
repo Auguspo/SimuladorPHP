@@ -3,15 +3,12 @@
 declare(strict_types=1);
 
 if (!defined('PROJECT_ROOT')) {
-    // 1. Si private/ está un nivel arriba de public_html (ej. /home/usuario/private)
-    if (file_exists(dirname(__DIR__) . '/private/config.php')) {
+    if (@file_exists(dirname(__DIR__) . '/private/config.php')) {
         define('PROJECT_ROOT', dirname(__DIR__));
     }
-    // 2. Si private/ está dentro de public_html (ej. /home/usuario/public_html/private)
-    elseif (file_exists(__DIR__ . '/private/config.php')) {
+    elseif (@file_exists(__DIR__ . '/private/config.php')) {
         define('PROJECT_ROOT', __DIR__);
     }
-    // 3. Fallback predeterminado (un nivel arriba)
     else {
         define('PROJECT_ROOT', dirname(__DIR__));
     }

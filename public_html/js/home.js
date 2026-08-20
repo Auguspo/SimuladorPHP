@@ -156,15 +156,17 @@ function getSortIndicator(col) {
 function renderTable(sessions, totalFiltered, totalPages) {
     const rows = sessions.map(session => `
         <tr>
-            <td>#${session.id}</td>
-            <td>${formatDateAR(session.tested_at)}</td>
-            <td style="font-weight: 500;">${escapeHtml(session.participant_name)}</td>
-            <td>${escapeHtml(session.participant_dni)}</td>
-            <td>${session.participant_age ?? '-'}</td>
-            <td>${session.participant_weight_kg !== null ? formatNumberAR(session.participant_weight_kg, 2) : '-'}</td>
-            <td>${escapeHtml(session.participant_comment || '-')}</td>
-            <td>${session.events_count}</td>
-            <td><a href="/sesion/${session.id}" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Ver</a></td>
+            <td data-label="#">#${session.id}</td>
+            <td data-label="Fecha">${formatDateAR(session.tested_at)}</td>
+            <td data-label="Conductor" style="font-weight: 500;">
+                ${escapeHtml(session.participant_name)}
+                <div style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(session.participant_dni)}</div>
+            </td>
+            <td data-label="Edad">${session.participant_age ?? '-'}</td>
+            <td data-label="Puntaje" style="font-weight: bold; color: ${session.instructor_score !== null ? 'var(--primary)' : 'var(--text-muted)'};">${session.instructor_score ?? '-'}</td>
+            <td data-label="Comentario">${escapeHtml(session.participant_comment || '-')}</td>
+            <td data-label="Eventos">${session.events_count}</td>
+            <td data-label="Detalle"><a href="/sesion/${session.id}" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Ver</a></td>
         </tr>
     `).join('');
 
@@ -203,9 +205,8 @@ function renderTable(sessions, totalFiltered, totalPages) {
                         <th onclick="sortSessions('id')" style="cursor: pointer; user-select: none;" title="Ordenar por ID">#${getSortIndicator('id')}</th>
                         <th onclick="sortSessions('tested_at')" style="cursor: pointer; user-select: none;" title="Ordenar por Fecha">Fecha${getSortIndicator('tested_at')}</th>
                         <th onclick="sortSessions('participant_name')" style="cursor: pointer; user-select: none;" title="Ordenar por Conductor">Conductor${getSortIndicator('participant_name')}</th>
-                        <th onclick="sortSessions('participant_dni')" style="cursor: pointer; user-select: none;" title="Ordenar por DNI">DNI${getSortIndicator('participant_dni')}</th>
                         <th onclick="sortSessions('participant_age')" style="cursor: pointer; user-select: none;" title="Ordenar por Edad">Edad${getSortIndicator('participant_age')}</th>
-                        <th onclick="sortSessions('participant_weight_kg')" style="cursor: pointer; user-select: none;" title="Ordenar por Peso">Peso (kg)${getSortIndicator('participant_weight_kg')}</th>
+                        <th onclick="sortSessions('instructor_score')" style="cursor: pointer; user-select: none;" title="Ordenar por Puntaje">Puntaje${getSortIndicator('instructor_score')}</th>
                         <th onclick="sortSessions('participant_comment')" style="cursor: pointer; user-select: none;" title="Ordenar por Comentario">Comentario${getSortIndicator('participant_comment')}</th>
                         <th onclick="sortSessions('events_count')" style="cursor: pointer; user-select: none;" title="Ordenar por Eventos">Eventos${getSortIndicator('events_count')}</th>
                         <th>Detalle</th>
