@@ -318,14 +318,14 @@ function initScoringModal() {
     scoringQuestions.forEach((q, index) => {
         const bg = index % 2 === 0 ? 'rgba(0,0,0,0.02)' : 'transparent';
         html += `
-        <tr style="background: ${bg}; border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 0.75rem; text-align: left; font-weight: 500; border: 1px solid #e2e8f0;">${q.label}</td>
-            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="1" onchange="updateScoringTotal()" required></td>
-            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="2" onchange="updateScoringTotal()"></td>
-            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="3" onchange="updateScoringTotal()"></td>
-            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="4" onchange="updateScoringTotal()"></td>
-            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="5" onchange="updateScoringTotal()"></td>
-            <td style="border: 1px solid #e2e8f0; font-weight: bold; background: #f7fafc;" id="val_${q.id}">0</td>
+        <tr style="background: ${index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'}; border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; text-align: left; font-weight: 500;">${q.label}</td>
+            <td><input type="radio" name="${q.id}" value="1" onchange="updateScoringTotal()" required></td>
+            <td><input type="radio" name="${q.id}" value="2" onchange="updateScoringTotal()"></td>
+            <td><input type="radio" name="${q.id}" value="3" onchange="updateScoringTotal()"></td>
+            <td><input type="radio" name="${q.id}" value="4" onchange="updateScoringTotal()"></td>
+            <td><input type="radio" name="${q.id}" value="5" onchange="updateScoringTotal()"></td>
+            <td style="font-weight: bold; color: var(--primary);" id="val_${q.id}">0</td>
         </tr>`;
     });
     tbody.innerHTML = html;

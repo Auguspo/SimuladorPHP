@@ -73,49 +73,41 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
 </div>
 
 <!-- Modal para Scoring -->
-<div id="scoringModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto;">
-    <div class="card" style="width: 100%; max-width: 900px; margin: 20px auto; background: white; color: #333; padding: 2rem; border-radius: 4px;">
+<div id="scoringModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 1rem;">
+    <div class="card" style="width: 100%; max-width: 800px; margin: auto; max-height: 90vh; overflow-y: auto;">
         
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border-bottom: 2px solid #1a365d; padding-bottom: 1rem;">
-            <div>
-                <h2 style="margin: 0; font-size: 1.8rem; color: #1a365d;">SCORING</h2>
-                <p style="margin: 0; font-size: 0.9rem; color: #4a5568;">PR-CA-04-F10 V.00  06/03/2026</p>
-            </div>
-            <div style="background: #1a365d; color: #48bb78; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; border: 3px solid #2b6cb0;">
-                <span style="color: white;">GS</span>E
-            </div>
-        </div>
+        <h2 style="margin-top: 0; font-size: 1.25rem; margin-bottom: 1.5rem;">Completar Scoring</h2>
 
         <form id="scoringForm" onsubmit="submitScoring(event)">
             <input type="hidden" id="scoringSessionId">
             
             <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: center; border: 1px solid #e2e8f0;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center;">
                     <thead>
-                        <tr style="background: #4a5568; color: white;">
-                            <th style="padding: 0.5rem; text-align: left; width: 40%; border: 1px solid #e2e8f0;">Preguntas</th>
-                            <th style="padding: 0.5rem; background: #e53e3e; border: 1px solid #e2e8f0; width: 10%;">Muy malo</th>
-                            <th style="padding: 0.5rem; background: #f56565; border: 1px solid #e2e8f0; width: 10%;">Malo</th>
-                            <th style="padding: 0.5rem; background: #ed8936; border: 1px solid #e2e8f0; width: 10%;">Regular</th>
-                            <th style="padding: 0.5rem; background: #68d391; border: 1px solid #e2e8f0; width: 10%;">Bueno</th>
-                            <th style="padding: 0.5rem; background: #38a169; border: 1px solid #e2e8f0; width: 10%;">Muy bueno</th>
-                            <th style="padding: 0.5rem; background: #2d3748; border: 1px solid #e2e8f0; width: 10%;">VALORES</th>
+                        <tr style="border-bottom: 2px solid var(--border);">
+                            <th style="padding: 0.5rem; text-align: left; width: 40%;">Preguntas</th>
+                            <th style="padding: 0.5rem; width: 10%;">Muy malo (1)</th>
+                            <th style="padding: 0.5rem; width: 10%;">Malo (2)</th>
+                            <th style="padding: 0.5rem; width: 10%;">Regular (3)</th>
+                            <th style="padding: 0.5rem; width: 10%;">Bueno (4)</th>
+                            <th style="padding: 0.5rem; width: 10%;">Muy bueno (5)</th>
+                            <th style="padding: 0.5rem; width: 10%;">VALOR</th>
                         </tr>
                     </thead>
                     <tbody id="scoringTableBody">
                         <!-- Generado por JS -->
                     </tbody>
                     <tfoot>
-                        <tr>
-                            <td colspan="6" style="text-align: right; padding: 1rem; font-weight: bold;">TOTAL:</td>
-                            <td style="background: #2d3748; color: white; font-weight: bold; font-size: 1.1rem; border: 1px solid #e2e8f0;" id="scoringTotal">0</td>
+                        <tr style="border-top: 2px solid var(--border);">
+                            <td colspan="6" style="text-align: right; padding: 1rem; font-weight: bold; font-size: 1rem;">TOTAL:</td>
+                            <td style="color: var(--primary); font-weight: bold; font-size: 1.25rem;" id="scoringTotal">0</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
-                <button type="button" class="btn btn-secondary" onclick="closeScoringModal()" style="color: #333; border: 1px solid #ccc;">Cerrar</button>
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeScoringModal()">Cancelar</button>
                 <button type="submit" class="btn btn-primary" id="btnSaveScoring">Guardar Scoring</button>
             </div>
         </form>

@@ -21,7 +21,8 @@ $scoringModel = new ScoringModel();
 $scoring = $scoringModel->getBySessionId((int)$sessionId);
 
 if (!$scoring) {
-    die("No hay scoring guardado para esta sesión");
+    header("Location: /sesion/$sessionId?error=true&msj=" . urlencode("Faltan completar datos para exportar"));
+    exit;
 }
 
 $filename = "Scoring_" . preg_replace('/[^a-zA-Z0-9_-]/', '_', $session['participant_name']) . "_" . date('Y-m-d', strtotime($session['tested_at'])) . ".xls";
