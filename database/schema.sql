@@ -62,6 +62,7 @@ CREATE TABLE session_events (
     result ENUM('ACIERTO', 'ERROR') NOT NULL,
     time_ms INT UNSIGNED NOT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    traction_mode ENUM('2H', '4H', '4L', 'Indefinido') NOT NULL DEFAULT 'Indefinido',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_session_events_number (session_id, event_number),
     CONSTRAINT fk_session_events_session
