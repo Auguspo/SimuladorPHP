@@ -50,6 +50,12 @@ async function loadSession() {
         if (scoringBtn) {
             scoringBtn.style.display = canEdit ? 'inline-block' : 'none';
         }
+        
+        const exportScoringBtn = document.getElementById('btnExportScoring');
+        if (exportScoringBtn) {
+            exportScoringBtn.style.display = canEdit ? 'inline-flex' : 'none';
+            exportScoringBtn.href = `/export_scoring.php?id=${currentSessionData.id}`;
+        }
     } catch (error) {
         status.textContent = 'Error de red al obtener la sesión.';
         container.innerHTML = '<div class="empty-state">No se pudo conectar con el servidor.</div>';
