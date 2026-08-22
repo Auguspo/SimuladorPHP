@@ -21,6 +21,10 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                 Exportar PDF
             </button>
+            <!-- Botón de Scoring -->
+            <button id="btnScoring" class="btn btn-primary btn-sm" onclick="openScoringModal()" style="display: none;">
+                Scoring
+            </button>
             <!-- Botón de editar (se muestra por JS si tiene permisos) -->
             <button id="btnEditSession" class="btn btn-primary btn-sm" style="display: none;" onclick="openEditModal()">
                 Editar Datos
@@ -57,6 +61,56 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
             <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
                 <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Scoring -->
+<div id="scoringModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto;">
+    <div class="card" style="width: 100%; max-width: 900px; margin: 20px auto; background: white; color: #333; padding: 2rem; border-radius: 4px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border-bottom: 2px solid #1a365d; padding-bottom: 1rem;">
+            <div>
+                <h2 style="margin: 0; font-size: 1.8rem; color: #1a365d;">SCORING</h2>
+                <p style="margin: 0; font-size: 0.9rem; color: #4a5568;">PR-CA-04-F10 V.00  06/03/2026</p>
+            </div>
+            <div style="background: #1a365d; color: #48bb78; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; border: 3px solid #2b6cb0;">
+                <span style="color: white;">GS</span>E
+            </div>
+        </div>
+
+        <form id="scoringForm" onsubmit="submitScoring(event)">
+            <input type="hidden" id="scoringSessionId">
+            
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: center; border: 1px solid #e2e8f0;">
+                    <thead>
+                        <tr style="background: #4a5568; color: white;">
+                            <th style="padding: 0.5rem; text-align: left; width: 40%; border: 1px solid #e2e8f0;">Preguntas</th>
+                            <th style="padding: 0.5rem; background: #e53e3e; border: 1px solid #e2e8f0; width: 10%;">Muy malo</th>
+                            <th style="padding: 0.5rem; background: #f56565; border: 1px solid #e2e8f0; width: 10%;">Malo</th>
+                            <th style="padding: 0.5rem; background: #ed8936; border: 1px solid #e2e8f0; width: 10%;">Regular</th>
+                            <th style="padding: 0.5rem; background: #68d391; border: 1px solid #e2e8f0; width: 10%;">Bueno</th>
+                            <th style="padding: 0.5rem; background: #38a169; border: 1px solid #e2e8f0; width: 10%;">Muy bueno</th>
+                            <th style="padding: 0.5rem; background: #2d3748; border: 1px solid #e2e8f0; width: 10%;">VALORES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoringTableBody">
+                        <!-- Generado por JS -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6" style="text-align: right; padding: 1rem; font-weight: bold;">TOTAL:</td>
+                            <td style="background: #2d3748; color: white; font-weight: bold; font-size: 1.1rem; border: 1px solid #e2e8f0;" id="scoringTotal">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeScoringModal()" style="color: #333; border: 1px solid #ccc;">Cerrar</button>
+                <button type="submit" class="btn btn-primary" id="btnSaveScoring">Guardar Scoring</button>
             </div>
         </form>
     </div>

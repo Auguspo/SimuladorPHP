@@ -38,6 +38,7 @@ if ($initials === '') {
             <a href="/" class="<?= ($activeMenu ?? '') === 'home' ? 'active' : '' ?>">Sesiones</a>
             <a href="/participantes" class="<?= ($activeMenu ?? '') === 'participantes' ? 'active' : '' ?>">Participantes</a>
             <a href="/estadisticas" class="<?= ($activeMenu ?? '') === 'estadisticas' ? 'active' : '' ?>">Estadísticas</a>
+            <a href="/ranking" class="<?= ($activeMenu ?? '') === 'ranking' ? 'active' : '' ?>">Ranking</a>
             
             <a href="/opciones" class="<?= ($activeMenu ?? '') === 'opciones' ? 'active' : '' ?>" style="display: inline-flex; align-items: center; gap: 0.5rem;">
                 <div class="avatar-circle" title="<?= htmlspecialchars(trim($userFirstName . ' ' . $userLastName)) ?>">

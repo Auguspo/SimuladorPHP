@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+ini_set('error_log', __DIR__ . '/error_debug.log');
+
 if (!defined('PROJECT_ROOT')) {
     if (@file_exists(dirname(__DIR__) . '/private/config.php')) {
         define('PROJECT_ROOT', dirname(__DIR__));
@@ -18,6 +20,30 @@ if (!defined('PROJECT_ROOT')) {
 if (file_exists(PROJECT_ROOT . '/private/config.php')) {
     require_once PROJECT_ROOT . '/private/config.php';
 }
+if (file_exists(PROJECT_ROOT . '/private/db.php')) {
+    require_once PROJECT_ROOT . '/private/db.php';
+}
+
+// Autoloader PSR-4 simple para el namespace App\
+spl_autoload_register(function (string $class) {
+    $prefix = 'App\\';
+    $base_dir = PROJECT_ROOT . '/src/';
+
+    if (strncmp($prefix, $class, strlen($prefix)) !== 0) {
+        return;
+    }
+
+    $relative_class = substr($class, strlen($prefix));
+    
+    // Las carpetas son en minúsculas pero el namespace usa mayúsculas
+    $path = explode('\\', $relative_class);
+    $path[0] = strtolower($path[0]); // controllers o models
+    $file = $base_dir . implode('/', $path) . '.php';
+
+    if (file_exists($file)) {
+        require $file;
+    }
+});
 
 /**
  * Minificador al vuelo para las respuestas HTML.

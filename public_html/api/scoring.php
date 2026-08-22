@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/bootstrap.php';
 require_once PROJECT_ROOT . '/private/auth.php';
 
-use App\Controllers\SessionController;
+use App\Controllers\ScoringController;
 
-$controller = new SessionController();
-$controller->toggleEventDeletion();
+$controller = new ScoringController();
+$controller->handleRequest();

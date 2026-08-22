@@ -40,9 +40,15 @@ async function loadSession() {
         status.textContent = `Sesión #${escapeHtml(json.session.id || sessionId)} cargada.`;
         container.innerHTML = renderSession(json.session, deletedFilter);
         
-        const canEdit = (window.CURRENT_USER_ROLE && window.CURRENT_USER_ROLE !== 'visualizador');
-        if (canEdit) {
-            document.getElementById('btnEditSession').style.display = 'inline-block';
+        const canEdit = (window.CURRENT_USER_ROLE === 'instructor' || window.CURRENT_USER_ROLE === 'admin');
+        const editBtn = document.getElementById('btnEditSession');
+        if (editBtn) {
+            editBtn.style.display = canEdit ? 'inline-block' : 'none';
+        }
+        
+        const scoringBtn = document.getElementById('btnScoring');
+        if (scoringBtn) {
+            scoringBtn.style.display = canEdit ? 'inline-block' : 'none';
         }
     } catch (error) {
         status.textContent = 'Error de red al obtener la sesión.';
@@ -283,3 +289,130 @@ function escapeHtml(value) {
 }
 
 loadSession();
+
+const scoringQuestions = [
+    { id: 'tiempoReaccionFrenadas', label: 'Tiempo de reacción ante frenadas' },
+    { id: 'usoSistemaActivoPasivo', label: 'Uso de sistema activo y pasivo' },
+    { id: 'frenadoAceleracionProgresiva', label: 'Frenado y aceleración progresiva' },
+    { id: 'respetoSenalesViales', label: 'Respeto de señales viales' },
+    { id: 'usoSenalizacionLuminaria', label: 'Uso de señalización luminaria' },
+    { id: 'tomaDecisionesSeguras', label: 'Toma de decisiones seguras' },
+    { id: 'evitacionManiobrasPeligrosas', label: 'Evitación de maniobras peligrosas o temerarias' },
+    { id: 'velocidadAdecuadaContexto', label: 'Velocidad adecuada al contexto' },
+    { id: 'conduccionSuavePredecible', label: 'Conducción suave y predecible' },
+    { id: 'maniobrasEvasivasSeguras', label: 'Maniobras evasivas seguras' },
+    { id: 'evaluacionCorrectaSalidasRiesgo', label: 'Evaluación correcta de salidas de riesgo' }
+];
+
+function initScoringModal() {
+    const tbody = document.getElementById('scoringTableBody');
+    if (!tbody) return;
+    
+    let html = '';
+    scoringQuestions.forEach((q, index) => {
+        const bg = index % 2 === 0 ? 'rgba(0,0,0,0.02)' : 'transparent';
+        html += `
+        <tr style="background: ${bg}; border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 0.75rem; text-align: left; font-weight: 500; border: 1px solid #e2e8f0;">${q.label}</td>
+            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="1" onchange="updateScoringTotal()" required></td>
+            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="2" onchange="updateScoringTotal()"></td>
+            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="3" onchange="updateScoringTotal()"></td>
+            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="4" onchange="updateScoringTotal()"></td>
+            <td style="border: 1px solid #e2e8f0;"><input type="radio" name="${q.id}" value="5" onchange="updateScoringTotal()"></td>
+            <td style="border: 1px solid #e2e8f0; font-weight: bold; background: #f7fafc;" id="val_${q.id}">0</td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function updateScoringTotal() {
+    let total = 0;
+    scoringQuestions.forEach(q => {
+        const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+        const val = selected ? parseInt(selected.value) : 0;
+        document.getElementById(`val_${q.id}`).textContent = val;
+        total += val;
+    });
+    document.getElementById('scoringTotal').textContent = total;
+}
+
+async function openScoringModal() {
+    if (!currentSessionData) return;
+    document.getElementById('scoringSessionId').value = currentSessionData.id;
+    
+    // Check role before allowing edits
+    const canEdit = (window.CURRENT_USER_ROLE === 'instructor' || window.CURRENT_USER_ROLE === 'admin' || window.CURRENT_USER_ROLE === 'master');
+    document.getElementById('btnSaveScoring').style.display = canEdit ? 'inline-block' : 'none';
+    
+    // Clear current form
+    document.getElementById('scoringForm').reset();
+    updateScoringTotal();
+    
+    // Disable inputs if not allowed
+    document.querySelectorAll('#scoringTableBody input[type="radio"]').forEach(el => {
+        el.disabled = !canEdit;
+    });
+
+    try {
+        const res = await fetch(`/api/scoring?session_id=${currentSessionData.id}`);
+        const json = await res.json();
+        
+        if (json.ok && json.scoring) {
+            const data = json.scoring;
+            scoringQuestions.forEach(q => {
+                if (data[q.id]) {
+                    const radio = document.querySelector(`input[name="${q.id}"][value="${data[q.id]}"]`);
+                    if (radio) radio.checked = true;
+                }
+            });
+            updateScoringTotal();
+        }
+    } catch (e) {
+        console.error(e);
+    }
+    
+    document.getElementById('scoringModal').style.display = 'flex';
+}
+
+function closeScoringModal() {
+    document.getElementById('scoringModal').style.display = 'none';
+}
+
+async function submitScoring(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSaveScoring');
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+    
+    const payload = {
+        session_id: document.getElementById('scoringSessionId').value,
+        totalScore: document.getElementById('scoringTotal').textContent
+    };
+    
+    scoringQuestions.forEach(q => {
+        const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+        payload[q.id] = selected ? parseInt(selected.value) : 0;
+    });
+    
+    try {
+        const res = await fetch('/api/scoring', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.ok) {
+            closeScoringModal();
+        } else {
+            alert(json.error || 'Error al guardar el scoring');
+        }
+    } catch (e) {
+        alert('Error de conexión');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Guardar Scoring';
+    }
+}
+
+// Call init on load
+initScoringModal();

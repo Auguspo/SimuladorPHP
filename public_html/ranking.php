@@ -5,4 +5,4 @@ require_once PROJECT_ROOT . '/private/auth.php';
 use App\Controllers\PageController;
 
 $controller = new PageController();
-$controller->home();
+$controller->ranking();
