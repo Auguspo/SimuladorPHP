@@ -39,6 +39,7 @@ CREATE TABLE sessions (
     participant_age TINYINT UNSIGNED NULL,
     participant_weight_kg DECIMAL(5,2) NULL,
     participant_comment TEXT NULL,
+    instructor_score INT NULL,
     traction_mode ENUM('2H', '4H', '4L', 'Indefinido') NOT NULL DEFAULT 'Indefinido',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
