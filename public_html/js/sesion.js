@@ -40,7 +40,7 @@ async function loadSession() {
         status.textContent = `Sesión #${escapeHtml(json.session.id || sessionId)} cargada.`;
         container.innerHTML = renderSession(json.session, deletedFilter);
         
-        const canEdit = (window.CURRENT_USER_ROLE === 'instructor' || window.CURRENT_USER_ROLE === 'admin');
+        const canEdit = (window.CURRENT_USER_ROLE === 'instructor' || window.CURRENT_USER_ROLE === 'master');
         const editBtn = document.getElementById('btnEditSession');
         if (editBtn) {
             editBtn.style.display = canEdit ? 'inline-block' : 'none';

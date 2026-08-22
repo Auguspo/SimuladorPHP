@@ -104,11 +104,11 @@ class SessionController extends ApiController
         $this->requireMethod('POST');
         try {
             $data = json_decode(file_get_contents('php://input'), true);
-            if (!isset($data['id']) || !isset($data['traction_mode'])) {
+            if (!isset($data['event_id']) || !isset($data['traction_mode'])) {
                 $this->jsonResponse(400, ['ok' => false, 'error' => 'Missing data']);
             }
 
-            $this->eventModel->updateTraction((int)$data['id'], $data['traction_mode']);
+            $this->eventModel->updateTraction((int)$data['event_id'], $data['traction_mode']);
             $this->jsonResponse(200, ['ok' => true]);
         } catch (Throwable $exception) {
             error_log($exception->getMessage());
