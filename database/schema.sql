@@ -97,3 +97,22 @@ INSERT INTO system_settings (setting_key, setting_value) VALUES
 ('max_timeout_ms', '8000')
 ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);
 
+
+CREATE TABLE IF NOT EXISTS session_scorings (
+    session_id BIGINT UNSIGNED NOT NULL,
+    tiempoReaccionFrenadas TINYINT NOT NULL DEFAULT 0,
+    usoSistemaActivoPasivo TINYINT NOT NULL DEFAULT 0,
+    frenadoAceleracionProgresiva TINYINT NOT NULL DEFAULT 0,
+    respetoSenalesViales TINYINT NOT NULL DEFAULT 0,
+    usoSenalizacionLuminaria TINYINT NOT NULL DEFAULT 0,
+    tomaDecisionesSeguras TINYINT NOT NULL DEFAULT 0,
+    evitacionManiobrasPeligrosas TINYINT NOT NULL DEFAULT 0,
+    velocidadAdecuadaContexto TINYINT NOT NULL DEFAULT 0,
+    conduccionSuavePredecible TINYINT NOT NULL DEFAULT 0,
+    maniobrasEvasivasSeguras TINYINT NOT NULL DEFAULT 0,
+    evaluacionCorrectaSalidasRiesgo TINYINT NOT NULL DEFAULT 0,
+    totalScore SMALLINT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (session_id),
+    CONSTRAINT fk_scoring_session FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
