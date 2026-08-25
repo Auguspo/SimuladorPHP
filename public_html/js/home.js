@@ -9,7 +9,7 @@ async function loadSessions() {
     const container = document.getElementById('table-container');
 
     try {
-        const response = await fetch('/api/latest_sessions');
+        const response = await fetch('/api/latest_sessions.php');
         if (response.redirected && response.url.includes('login')) {
             window.location.href = '/login';
             return;

@@ -31,6 +31,6 @@ require __DIR__ . '/layout/header.php';
     </div>
 </div>
 
-<script src="/js/ranking.js?v=<?= date('Ymd') ?>"></script>
+<script src="/js/ranking.js?v=<?= time() ?>"></script>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>

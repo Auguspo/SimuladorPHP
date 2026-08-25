@@ -27,8 +27,8 @@ if ($initials === '') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
-    <script src="/js/formatters.js?v=<?= date('Ymd') ?>"></script>
-    <script src="/js/statusModal_v2.js?v=<?= date('Ymd') ?>"></script>
+    <script src="/js/formatters.js?v=<?= time() ?>"></script>
+    <script src="/js/statusModal_v2.js?v=<?= time() ?>"></script>
 </head>
 <body>
     <div class="topbar">

@@ -9,7 +9,7 @@ async function loadParticipants() {
     const container = document.getElementById('table-container');
 
     try {
-        const response = await fetch('/api/participants');
+        const response = await fetch('/api/participants.php');
         if (response.redirected && response.url.includes('login')) {
             window.location.href = '/login';
             return;

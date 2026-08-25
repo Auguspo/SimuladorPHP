@@ -16,7 +16,7 @@ async function loadConductorSessions() {
     }
 
     try {
-        const response = await fetch(`/api/conductor_sessions?id=${encodeURIComponent(participantId)}`);
+        const response = await fetch(`/api/conductor_sessions.php?id=${encodeURIComponent(participantId)}`);
         
         if (response.redirected && response.url.includes('login')) {
             window.location.href = '/login';

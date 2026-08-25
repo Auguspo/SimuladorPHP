@@ -7,7 +7,7 @@ let allParticipants = [];
 
 async function loadParticipantsDropdown() {
     try {
-        const response = await fetch('/api/participants');
+        const response = await fetch('/api/participants.php');
         const json = await response.json();
         if (json.ok && Array.isArray(json.participants)) {
             allParticipants = json.participants;

@@ -4,7 +4,7 @@ async function loadRanking() {
     const tbody = document.getElementById('rankingTableBody');
     
     try {
-        const response = await fetch('/api/ranking');
+        const response = await fetch('/api/ranking.php');
         if (response.redirected && response.url.includes('login')) {
             window.location.href = '/login';
             return;

@@ -212,7 +212,7 @@ async function submitEditSession(e) {
     };
     
     try {
-        const response = await fetch('/api/update_session', {
+        const response = await fetch('/api/update_session.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -236,7 +236,7 @@ async function submitEditSession(e) {
 // NUEVO: Función para actualizar la tracción de un evento
 async function updateEventTraction(eventId, newTraction) {
     try {
-        const response = await fetch('/api/update_event_traction', {
+        const response = await fetch('/api/update_event_traction.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -259,7 +259,7 @@ async function toggleEventDeletion(eventId, isDeleted) {
     if (!eventId) return;
 
     try {
-        const response = await fetch('/api/toggle_event_deletion', {
+        const response = await fetch('/api/toggle_event_deletion.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -360,7 +360,7 @@ async function openScoringModal() {
     });
 
     try {
-        const res = await fetch(`/api/scoring?session_id=${currentSessionData.id}`);
+        const res = await fetch(`/api/scoring.php?session_id=${currentSessionData.id}`);
         const json = await res.json();
         
         if (json.ok && json.scoring) {

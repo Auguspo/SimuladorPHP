@@ -17,6 +17,6 @@ require __DIR__ . '/layout/header.php';
     <div id="table-container"></div>
 </div>
 
-<script src="/js/participantes.js?v=<?= date('Ymd') ?>"></script>
+<script src="/js/participantes.js?v=<?= time() ?>"></script>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>
