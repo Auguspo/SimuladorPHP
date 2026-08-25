@@ -21,7 +21,7 @@ async function loadSession() {
     const deletedFilter = document.getElementById('sessionDeletedFilter')?.value || 'N';
 
     try {
-        const response = await fetch(`/api/session_detail?id=${encodeURIComponent(sessionId)}&deleted=${deletedFilter}`);
+        const response = await fetch(`/api/session_detail.php?id=${encodeURIComponent(sessionId)}&deleted=${deletedFilter}`);
         
         if (response.redirected && response.url.includes('login')) {
             window.location.href = '/login';
@@ -405,7 +405,7 @@ async function submitScoring(e) {
     });
     
     try {
-        const res = await fetch('/api/scoring', {
+        const res = await fetch('/api/scoring.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
