@@ -27,7 +27,8 @@ if ($initials === '') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
-    <script src="/js/formatters.js?v=1"></script>
+    <script src="/js/formatters.js?v=<?= date('Ymd') ?>"></script>
+    <script src="/js/statusModal.js?v=<?= date('Ymd') ?>"></script>
 </head>
 <body>
     <div class="topbar">
@@ -38,7 +39,7 @@ if ($initials === '') {
             <a href="/" class="<?= ($activeMenu ?? '') === 'home' ? 'active' : '' ?>">Sesiones</a>
             <a href="/participantes" class="<?= ($activeMenu ?? '') === 'participantes' ? 'active' : '' ?>">Participantes</a>
             <a href="/estadisticas" class="<?= ($activeMenu ?? '') === 'estadisticas' ? 'active' : '' ?>">Estadísticas</a>
-            <a href="/ranking" class="<?= ($activeMenu ?? '') === 'ranking' ? 'active' : '' ?>">Ranking</a>
+            <!-- <a href="/ranking" class="<?= ($activeMenu ?? '') === 'ranking' ? 'active' : '' ?>">Ranking</a> -->
             
             <a href="/opciones" class="<?= ($activeMenu ?? '') === 'opciones' ? 'active' : '' ?>" style="display: inline-flex; align-items: center; gap: 0.5rem;">
                 <div class="avatar-circle" title="<?= htmlspecialchars(trim($userFirstName . ' ' . $userLastName)) ?>">

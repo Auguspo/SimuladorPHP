@@ -57,10 +57,12 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
                 <label>Peso (kg)</label>
                 <input type="number" step="0.1" id="editWeight" style="width: 100%; background: rgba(15,23,42,0.7); border: 1px solid var(--border); padding: 8px; color: white;">
             </div>
+            <!-- Puntaje ahora se maneja por la tabla session_scorings
             <div class="form-group">
                 <label>Puntaje Sesion</label>
                 <input type="number" id="editScore" placeholder="Ej: 10" style="width: 100%; background: rgba(15,23,42,0.7); border: 1px solid var(--border); padding: 8px; color: white;">
             </div>
+            -->
             <div class="form-group">
                 <label>Comentarios</label>
                 <textarea id="editComment" rows="4" style="width: 100%; background: rgba(15,23,42,0.7); border: 1px solid var(--border); padding: 8px; color: white; resize: vertical;"></textarea>
@@ -77,7 +79,7 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
 <div id="scoringModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 1rem;">
     <div class="card" style="width: 100%; max-width: 800px; margin: auto; max-height: 90vh; overflow-y: auto;">
         
-        <h2 style="margin-top: 0; font-size: 1.25rem; margin-bottom: 1.5rem;">Completar Scoring</h2>
+        <h2 style="margin-top: 0; font-size: 1.25rem; margin-bottom: 1.5rem;">Scoring</h2>
 
         <form id="scoringForm" onsubmit="submitScoring(event)">
             <input type="hidden" id="scoringSessionId">
@@ -87,12 +89,12 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
                     <thead>
                         <tr style="border-bottom: 2px solid var(--border);">
                             <th style="padding: 0.5rem; text-align: left; width: 40%;">Preguntas</th>
-                            <th style="padding: 0.5rem; width: 10%;">Muy malo (1)</th>
-                            <th style="padding: 0.5rem; width: 10%;">Malo (2)</th>
-                            <th style="padding: 0.5rem; width: 10%;">Regular (3)</th>
-                            <th style="padding: 0.5rem; width: 10%;">Bueno (4)</th>
-                            <th style="padding: 0.5rem; width: 10%;">Muy bueno (5)</th>
-                            <th style="padding: 0.5rem; width: 10%;">VALOR</th>
+                            <th style="padding: 0.5rem; width: 10%; border-left: 1px solid rgba(255,255,255,0.1);">Muy malo</th>
+                            <th style="padding: 0.5rem; width: 10%; border-left: 1px solid rgba(255,255,255,0.1);">Malo</th>
+                            <th style="padding: 0.5rem; width: 10%; border-left: 1px solid rgba(255,255,255,0.1);">Regular</th>
+                            <th style="padding: 0.5rem; width: 10%; border-left: 1px solid rgba(255,255,255,0.1);">Bueno</th>
+                            <th style="padding: 0.5rem; width: 10%; border-left: 1px solid rgba(255,255,255,0.1);">Muy bueno</th>
+                            <th style="padding: 0.5rem; width: 10%; border-left: 1px solid rgba(255,255,255,0.1);">Puntaje</th>
                         </tr>
                     </thead>
                     <tbody id="scoringTableBody">
@@ -115,6 +117,6 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
     </div>
 </div>
 
-<script src="/js/sesion.js?v=4"></script>
+<script src="/js/sesion.js?v=<?= date('Ymd') ?>"></script>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>

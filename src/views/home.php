@@ -18,6 +18,6 @@ require __DIR__ . '/layout/header.php';
     <div id="table-container"></div>
 </div>
 
-<script src="/js/home.js?v=2"></script>
+<script src="/js/home.js?v=<?= date('Ymd') ?>"></script>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>

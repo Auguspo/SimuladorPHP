@@ -12,6 +12,6 @@ require __DIR__ . '/layout/header.php';
     <div id="content"></div>
 </div>
 
-<script src="/js/conductor.js?v=2"></script>
+<script src="/js/conductor.js?v=<?= date('Ymd') ?>"></script>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>
