@@ -46,62 +46,88 @@ $questions = [
     'evaluacionCorrectaSalidasRiesgo' => 'Evaluación correcta de salidas de riesgo'
 ];
 
-echo "<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns=\"http://www.w3.org/TR/REC-html40\">";
-echo "<head><meta charset=\"UTF-8\"></head>";
-echo "<body>";
-echo "<table border='1' style='font-family: Arial, sans-serif; border-collapse: collapse;'>";
+echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+echo '<head><meta charset="UTF-8"></head>';
+echo '<body style="font-family: Calibri, sans-serif;">';
 
-// Header Info
-echo "<tr>";
-echo "<th colspan='2' style='background-color: #f3f4f6; text-align: left; padding: 10px;'>DATOS DEL PARTICIPANTE</th>";
-echo "<th colspan='4' style='background-color: #f3f4f6; text-align: left; padding: 10px;'>FECHA DE LA PRUEBA</th>";
-echo "<th style='background-color: #f3f4f6; text-align: left; padding: 10px;'>DNI</th>";
-echo "</tr>";
+echo '<table style="border-collapse: collapse; width: 100%;">';
 
-echo "<tr>";
-echo "<td colspan='2' style='padding: 5px; font-weight: bold;'>" . htmlspecialchars($session['participant_name']) . "</td>";
-echo "<td colspan='4' style='padding: 5px; font-weight: bold;'>" . date('d/m/Y H:i', strtotime($session['tested_at'])) . "</td>";
-echo "<td style='padding: 5px; font-weight: bold;'>" . htmlspecialchars($session['participant_dni'] ?? '-') . "</td>";
-echo "</tr>";
+// HEADER ROWS
+echo '<tr>';
+echo '<td colspan="5" style="font-size: 24px; font-weight: bold; color: #1e3a5f; border-bottom: none;">SCORING</td>';
+echo '<td colspan="3" rowspan="2" style="text-align: right; vertical-align: top;"><div style="background-color: #1e3a5f; color: white; border-radius: 50%; width: 80px; height: 80px; display: inline-block; text-align: center; line-height: 80px; font-size: 28px; font-weight: bold;">GSE</div></td>';
+echo '</tr>';
 
-// Empty row separator
-echo "<tr><td colspan='7'></td></tr>";
+echo '<tr>';
+echo '<td colspan="5" style="font-size: 16px; color: #1e3a5f; border-bottom: 2px solid #1e3a5f;">PR-CA-04-F10 V.00   06/03/2026</td>';
+echo '</tr>';
 
-// Table Headers
-echo "<tr>";
-echo "<th style='background-color: #e5e7eb; padding: 10px; text-align: left;'>MÉTRICA / EVALUACIÓN</th>";
-echo "<th style='background-color: #e5e7eb; padding: 10px; width: 40px; text-align: center;'>1</th>";
-echo "<th style='background-color: #e5e7eb; padding: 10px; width: 40px; text-align: center;'>2</th>";
-echo "<th style='background-color: #e5e7eb; padding: 10px; width: 40px; text-align: center;'>3</th>";
-echo "<th style='background-color: #e5e7eb; padding: 10px; width: 40px; text-align: center;'>4</th>";
-echo "<th style='background-color: #e5e7eb; padding: 10px; width: 40px; text-align: center;'>5</th>";
-echo "<th style='background-color: #d1d5db; padding: 10px; width: 80px; text-align: center;'>VALORES</th>";
-echo "</tr>";
+// Empty Rows
+echo '<tr><td colspan="8"></td></tr>';
+echo '<tr><td colspan="8"></td></tr>';
+echo '<tr><td colspan="8"></td></tr>';
 
-// Questions
+// USER INFO ROW
+echo '<tr>';
+echo '<td colspan="2" style="background-color: #4b5563; color: white; font-weight: bold; padding: 5px; text-align: right;">Nombre y Apellido :</td>';
+echo '<td colspan="2" style="border: 1px solid black; padding: 5px;">' . htmlspecialchars($session['participant_name']) . '</td>';
+echo '<td style="background-color: #4b5563; color: white; font-weight: bold; padding: 5px; text-align: right;">DNI:</td>';
+echo '<td style="border: 1px solid black; padding: 5px;">' . htmlspecialchars($session['participant_dni'] ?? '-') . '</td>';
+echo '<td style="background-color: #4b5563; color: white; font-weight: bold; padding: 5px; text-align: right;">Fecha:</td>';
+echo '<td style="border: 1px solid black; padding: 5px;">' . date('d/m/Y', strtotime($session['tested_at'])) . '</td>';
+echo '</tr>';
+
+echo '<tr><td colspan="8"></td></tr>';
+
+// TABLE HEADERS
+echo '<tr>';
+echo '<th colspan="2" style="background-color: #374151; color: white; font-weight: bold; padding: 5px; border: 1px solid black; text-align: center;">Preguntas</th>';
+echo '<th style="background-color: #dc2626; color: white; font-weight: bold; padding: 5px; border: 1px solid black; text-align: center;">Muy malo</th>';
+echo '<th style="background-color: #ef4444; color: white; font-weight: bold; padding: 5px; border: 1px solid black; text-align: center;">Malo</th>';
+echo '<th style="background-color: #f97316; color: white; font-weight: bold; padding: 5px; border: 1px solid black; text-align: center;">Regular</th>';
+echo '<th style="background-color: #84cc16; color: white; font-weight: bold; padding: 5px; border: 1px solid black; text-align: center;">Bueno</th>';
+echo '<th style="background-color: #65a30d; color: white; font-weight: bold; padding: 5px; border: 1px solid black; text-align: center;">Muy bueno</th>';
+echo '<th style="background-color: #374151; color: white; font-weight: bold; padding: 5px; border: 1px solid black; text-align: center;">VALORES</th>';
+echo '</tr>';
+
+// TABLE ROWS
 foreach ($questions as $key => $label) {
     $val = $scoring[$key] ?? 0;
-    echo "<tr>";
-    echo "<td style='padding: 8px; border: 1px solid #d1d5db;'>" . htmlspecialchars($label) . "</td>";
+    echo '<tr>';
+    echo '<td colspan="2" style="padding: 10px; font-weight: bold; text-align: center; border-bottom: none;">' . htmlspecialchars($label) . '</td>';
     
-    // Checkmarks for 1 to 5
-    for ($i = 1; $i <= 5; $i++) {
-        $mark = ($val == $i) ? 'X' : '';
-        echo "<td style='padding: 8px; border: 1px solid #d1d5db; text-align: center; font-weight: bold;'>" . $mark . "</td>";
-    }
+    // Checkmarks colored borders based on image (Muy Malo / Malo -> red, Regular -> orange, Bueno / Muy bueno -> green)
+    echo '<td style="border-left: 1px solid red; border-right: 1px solid red; text-align: center; vertical-align: middle;">' . (($val == 1) ? 'X' : '') . '</td>';
+    echo '<td style="border-left: 1px solid red; border-right: 1px solid red; text-align: center; vertical-align: middle;">' . (($val == 2) ? 'X' : '') . '</td>';
+    echo '<td style="border-left: 1px solid orange; border-right: 1px solid orange; text-align: center; vertical-align: middle;">' . (($val == 3) ? 'X' : '') . '</td>';
+    echo '<td style="border-left: 1px solid green; border-right: 1px solid green; text-align: center; vertical-align: middle;">' . (($val == 4) ? 'X' : '') . '</td>';
+    echo '<td style="border-left: 1px solid green; border-right: 1px solid black; text-align: center; vertical-align: middle;">' . (($val == 5) ? 'X' : '') . '</td>';
     
-    // Final Value
-    echo "<td style='padding: 8px; border: 1px solid #d1d5db; background-color: #f9fafb; font-weight: bold; text-align: center;'>" . $val . "</td>";
-    echo "</tr>";
+    // Value Column
+    echo '<td style="border-left: 1px solid black; border-right: 1px solid black; text-align: center; vertical-align: middle;">' . $val . '</td>';
+    echo '</tr>';
 }
 
-// Total
-$totalScore = $scoring['totalScore'] ?? 0;
-echo "<tr>";
-echo "<td colspan='6' style='padding: 10px; text-align: right; font-weight: bold; background-color: #f3f4f6;'>TOTAL SCORING:</td>";
-echo "<td style='padding: 10px; text-align: center; font-weight: bold; background-color: #e5e7eb; font-size: 14px;'>" . $totalScore . "</td>";
-echo "</tr>";
+// Bottom border for the table
+echo '<tr>';
+echo '<td colspan="2" style="border-top: 1px solid black;"></td>';
+echo '<td style="border-top: 1px solid red;"></td>';
+echo '<td style="border-top: 1px solid red;"></td>';
+echo '<td style="border-top: 1px solid orange;"></td>';
+echo '<td style="border-top: 1px solid green;"></td>';
+echo '<td style="border-top: 1px solid green;"></td>';
+echo '<td style="border-top: 1px solid black;"></td>';
+echo '</tr>';
 
-echo "</table>";
-echo "</body>";
-echo "</html>";
+// Total row
+$totalScore = $scoring['totalScore'] ?? 0;
+echo '<tr><td colspan="8"></td></tr>';
+echo '<tr><td colspan="8"></td></tr>';
+echo '<tr>';
+echo '<td colspan="8"></td>';
+echo '<td style="background-color: #374151; color: white; font-weight: bold; text-align: center; padding: 5px; border: 1px solid black;">' . $totalScore . '</td>';
+echo '</tr>';
+
+echo '</table>';
+echo '</body>';
+echo '</html>';
