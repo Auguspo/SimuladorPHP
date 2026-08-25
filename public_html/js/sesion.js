@@ -188,7 +188,7 @@ function openEditModal() {
     document.getElementById('editSessionId').value = currentSessionData.id;
     document.getElementById('editAge').value = currentSessionData.participant_age || '';
     document.getElementById('editWeight').value = currentSessionData.participant_weight_kg || '';
-    document.getElementById('editScore').value = currentSessionData.instructor_score || '';
+    // editScore removed
     document.getElementById('editComment').value = currentSessionData.participant_comment || '';
     document.getElementById('editSessionModal').style.display = 'flex';
 }
@@ -204,10 +204,10 @@ async function submitEditSession(e) {
     btn.textContent = 'Guardando...';
     
     const payload = {
-        session_id: document.getElementById('editSessionId').value,
+        id: document.getElementById('editSessionId').value,
         participant_age: document.getElementById('editAge').value,
         participant_weight_kg: document.getElementById('editWeight').value,
-        instructor_score: document.getElementById('editScore').value,
+        // instructor_score removed
         participant_comment: document.getElementById('editComment').value
     };
     
@@ -223,10 +223,10 @@ async function submitEditSession(e) {
             closeEditModal();
             loadSession(); // reload data
         } else {
-            alert(json.error || 'No se pudo actualizar');
+            window.statusModal('Error', json.error || 'No se pudo actualizar', true);
         }
     } catch (e) {
-        alert('Error de red');
+        window.statusModal('Error', 'Error de red', true);
     } finally {
         btn.disabled = false;
         btn.textContent = 'Guardar Cambios';
@@ -246,11 +246,11 @@ async function updateEventTraction(eventId, newTraction) {
         });
         const json = await response.json();
         if (!json.ok) {
-            alert(json.error || 'Error al actualizar tracción');
+            window.statusModal('Error', json.error || 'Error al actualizar tracción', true);
             loadSession(); // reset view
         }
     } catch (e) {
-        alert('Error de red');
+        window.statusModal('Error', 'Error de red', true);
         loadSession(); // reset view
     }
 }
@@ -272,7 +272,7 @@ async function toggleEventDeletion(eventId, isDeleted) {
 
         const json = await response.json();
         if (!json.ok) {
-            alert(json.error || 'No se pudo actualizar el estado del evento.');
+            window.statusModal('Error', json.error || 'No se pudo actualizar el estado del evento.', true);
             return;
         }
 
@@ -280,7 +280,7 @@ async function toggleEventDeletion(eventId, isDeleted) {
         loadSession();
     } catch (e) {
         console.error('Error al cambiar borrado del evento:', e);
-        alert('Error de conexión al actualizar el evento.');
+        window.statusModal('Error', 'Error de conexión al actualizar el evento.', true);
     }
 }
 
@@ -320,12 +320,12 @@ function initScoringModal() {
         html += `
         <tr style="background: ${index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'}; border-bottom: 1px solid var(--border);">
             <td style="padding: 0.75rem; text-align: left; font-weight: 500;">${q.label}</td>
-            <td><input type="radio" name="${q.id}" value="1" onchange="updateScoringTotal()" required></td>
-            <td><input type="radio" name="${q.id}" value="2" onchange="updateScoringTotal()"></td>
-            <td><input type="radio" name="${q.id}" value="3" onchange="updateScoringTotal()"></td>
-            <td><input type="radio" name="${q.id}" value="4" onchange="updateScoringTotal()"></td>
-            <td><input type="radio" name="${q.id}" value="5" onchange="updateScoringTotal()"></td>
-            <td style="font-weight: bold; color: var(--primary);" id="val_${q.id}">0</td>
+            <td style="border-left: 1px solid rgba(255,255,255,0.1); text-align: center; vertical-align: middle;"><input type="radio" style="transform: scale(1.5); cursor: pointer; margin: 0 auto; display: block;" name="${q.id}" value="1" onchange="updateScoringTotal()" required></td>
+            <td style="border-left: 1px solid rgba(255,255,255,0.1); text-align: center; vertical-align: middle;"><input type="radio" style="transform: scale(1.5); cursor: pointer; margin: 0 auto; display: block;" name="${q.id}" value="2" onchange="updateScoringTotal()"></td>
+            <td style="border-left: 1px solid rgba(255,255,255,0.1); text-align: center; vertical-align: middle;"><input type="radio" style="transform: scale(1.5); cursor: pointer; margin: 0 auto; display: block;" name="${q.id}" value="3" onchange="updateScoringTotal()"></td>
+            <td style="border-left: 1px solid rgba(255,255,255,0.1); text-align: center; vertical-align: middle;"><input type="radio" style="transform: scale(1.5); cursor: pointer; margin: 0 auto; display: block;" name="${q.id}" value="4" onchange="updateScoringTotal()"></td>
+            <td style="border-left: 1px solid rgba(255,255,255,0.1); text-align: center; vertical-align: middle;"><input type="radio" style="transform: scale(1.5); cursor: pointer; margin: 0 auto; display: block;" name="${q.id}" value="5" onchange="updateScoringTotal()"></td>
+            <td style="border-left: 1px solid rgba(255,255,255,0.1); font-weight: bold; color: var(--primary); text-align: center; vertical-align: middle;" id="val_${q.id}">0</td>
         </tr>`;
     });
     tbody.innerHTML = html;
@@ -386,11 +386,15 @@ function closeScoringModal() {
 
 async function submitScoring(e) {
     e.preventDefault();
-    const btn = document.getElementById('btnSaveScoring');
-    btn.disabled = true;
-    btn.textContent = 'Guardando...';
     
-    const payload = {
+    window.statusModal('Confirmar', '¿Estás seguro que deseas guardar este scoring?', false, true, async (confirmed) => {
+        if (!confirmed) return;
+        
+        const btn = document.getElementById('btnSaveScoring');
+        btn.disabled = true;
+        btn.textContent = 'Guardando...';
+        
+        const payload = {
         session_id: document.getElementById('scoringSessionId').value,
         totalScore: document.getElementById('scoringTotal').textContent
     };
@@ -409,15 +413,17 @@ async function submitScoring(e) {
         const json = await res.json();
         if (json.ok) {
             closeScoringModal();
+            window.statusModal('Éxito', 'El scoring se guardó correctamente.', false);
         } else {
-            alert(json.error || 'Error al guardar el scoring');
+            window.statusModal('Error', json.error || 'Error al guardar el scoring', true);
         }
     } catch (e) {
-        alert('Error de conexión');
+        window.statusModal('Error', 'Error de conexión', true);
     } finally {
         btn.disabled = false;
         btn.textContent = 'Guardar Scoring';
     }
+    });
 }
 
 // Call init on load

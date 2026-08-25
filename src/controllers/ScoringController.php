@@ -51,8 +51,8 @@ class ScoringController extends ApiController
         }
         
         $role = $_SESSION['role'] ?? 'visualizador';
-        if ($role !== 'instructor' && $role !== 'admin') {
-            $this->jsonResponse(403, ['ok' => false, 'error' => 'Unauthorized: Only instructors can edit scorings']);
+        if ($role !== 'instructor' && $role !== 'master' && $role !== 'admin') {
+            $this->jsonResponse(403, ['ok' => false, 'error' => 'Unauthorized: Solo instructores o masters pueden editar el scoring']);
         }
 
         $input = file_get_contents('php://input');

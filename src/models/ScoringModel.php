@@ -25,18 +25,18 @@ class ScoringModel extends BaseModel
         ) VALUES (
             :session_id, :v1, :v2, :v3, :v4, :v5, :v6, :v7, :v8, :v9, :v10, :v11, :total
         ) ON DUPLICATE KEY UPDATE
-            tiempoReaccionFrenadas = :v1,
-            usoSistemaActivoPasivo = :v2,
-            frenadoAceleracionProgresiva = :v3,
-            respetoSenalesViales = :v4,
-            usoSenalizacionLuminaria = :v5,
-            tomaDecisionesSeguras = :v6,
-            evitacionManiobrasPeligrosas = :v7,
-            velocidadAdecuadaContexto = :v8,
-            conduccionSuavePredecible = :v9,
-            maniobrasEvasivasSeguras = :v10,
-            evaluacionCorrectaSalidasRiesgo = :v11,
-            totalScore = :total
+            tiempoReaccionFrenadas = VALUES(tiempoReaccionFrenadas),
+            usoSistemaActivoPasivo = VALUES(usoSistemaActivoPasivo),
+            frenadoAceleracionProgresiva = VALUES(frenadoAceleracionProgresiva),
+            respetoSenalesViales = VALUES(respetoSenalesViales),
+            usoSenalizacionLuminaria = VALUES(usoSenalizacionLuminaria),
+            tomaDecisionesSeguras = VALUES(tomaDecisionesSeguras),
+            evitacionManiobrasPeligrosas = VALUES(evitacionManiobrasPeligrosas),
+            velocidadAdecuadaContexto = VALUES(velocidadAdecuadaContexto),
+            conduccionSuavePredecible = VALUES(conduccionSuavePredecible),
+            maniobrasEvasivasSeguras = VALUES(maniobrasEvasivasSeguras),
+            evaluacionCorrectaSalidasRiesgo = VALUES(evaluacionCorrectaSalidasRiesgo),
+            totalScore = VALUES(totalScore)
         ";
 
         $stmt = $this->pdo->prepare($sql);
