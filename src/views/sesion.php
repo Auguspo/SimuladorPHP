@@ -117,6 +117,6 @@ $userRole = $_SESSION['role'] ?? 'visualizador';
     </div>
 </div>
 
-<script src="/js/sesion.js?v=<?= date('Ymd') ?>"></script>
+<script src="/js/sesion_v2.js?v=<?= date('Ymd') ?>"></script>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>
