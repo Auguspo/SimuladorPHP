@@ -66,4 +66,4 @@ if ($currentUserRole !== 'visualizador') {
     $allUsersList = $userController->getAllUsers();
 }
 
-require_once PROJECT_ROOT . '/src/views/opciones.php';
+require_once PROJECT_ROOT . '/src/views/opciones.html';

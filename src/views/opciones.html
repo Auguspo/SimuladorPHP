@@ -1,0 +1,340 @@
+<?php
+$pageTitle = 'Menú Principal';
+$activeMenu = 'opciones';
+require __DIR__ . '/layout/header.html';
+
+$userData = $currentUserData ?? [
+    'name' => $_SESSION['name'] ?? '',
+    'first_name' => $_SESSION['first_name'] ?? '',
+    'last_name' => $_SESSION['last_name'] ?? '',
+    'role' => $_SESSION['role'] ?? 'visualizador'
+];
+
+$role = $userData['role'] ?? 'visualizador';
+$canManageUsers = ($role === 'master' || $role === 'instructor');
+?>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="margin: 0; font-size: 1.75rem;">Menú Principal & Perfil</h1>
+            <p style="color: var(--text-muted); margin: 0.25rem 0 0 0;">Gestión de cuenta y administración de accesos del sistema.</p>
+        </div>
+        <div>
+            <a href="/logout" class="btn btn-danger" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Cerrar Sesión
+            </a>
+        </div>
+    </div>
+
+    <!-- Mensajes de Alerta -->
+    <?php if (!empty($successMessage)): ?>
+        <div class="alert alert-success" style="margin-top: 1.5rem;">
+            ✓ <?= htmlspecialchars($successMessage) ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($errorMessage)): ?>
+        <div class="alert alert-error" style="margin-top: 1.5rem;">
+            ⚠ <?= htmlspecialchars($errorMessage) ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- Naves de Pestañas (Tabs) -->
+    <div class="tab-header" style="margin-top: 2rem;">
+        <button type="button" class="tab-btn active" onclick="switchTab('profileTab', this)">Mi Perfil</button>
+        <?php if ($canManageUsers): ?>
+            <button type="button" class="tab-btn" onclick="switchTab('usersTab', this)">Gestión de Usuarios (<?= count($allUsersList ?? []) ?>)</button>
+            <!-- <button type="button" class="tab-btn" onclick="switchTab('settingsTab', this)">Límites de Reacción</button> -->
+        <?php endif; ?>
+    </div>
+
+    <!-- PESTAÑA 1: MI PERFIL -->
+    <div id="profileTab" class="tab-content" style="background: transparent; border: none; padding: 0; box-shadow: none;">
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+        <!-- SIDEBAR -->
+        <div style="width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Avatar Card -->
+            <div style="background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 2rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <div style="width: 86px; height: 86px; border-radius: 50%; background: var(--primary); color: #031C37; font-size: 2.25rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+                    <?= htmlspecialchars($initials) ?>
+                </div>
+                <h3 style="margin: 0; color: white; font-size: 1.2rem; font-weight: 700;"><?= htmlspecialchars(trim(($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '')) ?: $userData['name']) ?></h3>
+                <span style="color: var(--primary); font-size: 0.9rem; margin-top: 0.35rem; font-weight: 500;"><?= htmlspecialchars(ucfirst($role)) ?></span>
+            </div>
+            
+            <!-- Side Nav -->
+            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <button type="button" onclick="switchProfileSubTab('personal')" id="btnTabPersonal" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: rgba(113, 255, 0, 0.05); border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; text-align: left; cursor: pointer; font-weight: 500; font-size: 0.95rem; transition: all 0.2s;">
+                    <svg viewBox="0 0 88.38 96.67" style="width: 18px; height: 18px; fill: currentColor;"><path d="M5.02,91.73c1.31-20.73,18.51-37.13,39.17-37.13s37.98,16.39,39.17,37.13H5.02ZM24.6,27.36c0-12.78,10.39-22.3,19.59-22.3s19.71,9.52,19.71,22.3-10.51,22.3-19.71,22.3-19.59-9.64-19.59-22.3ZM55.66,51.11c8-4.94,13.14-14.71,13.14-23.75,0-12.9-10.39-27.36-24.6-27.36s-24.48,14.46-24.48,27.36c0,9.04,5.14,18.8,13.14,23.75C13.85,56.17,0,73.65,0,94.26c0,1.33,1.19,2.41,2.51,2.41h83.48c1.31,0,2.39-1.08,2.39-2.41,0-20.61-13.85-38.09-32.72-43.15Z"/></svg>
+                    Datos personales
+                </button>
+                <button type="button" onclick="switchProfileSubTab('security')" id="btnTabSecurity" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: transparent; border: 1px solid transparent; color: var(--text-muted); border-radius: 8px; text-align: left; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Seguridad
+                </button>
+              
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div style="flex-grow: 1; min-width: 300px; background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 2.5rem;">
+            
+            <form method="POST" action="/opciones">
+                <input type="hidden" name="action" value="update_profile" />
+                
+                <!-- SUBTAB: DATOS PERSONALES -->
+                <div id="subtabPersonal">
+                    <h2 style="margin: 0 0 2rem 0; font-size: 1.5rem; color: white;">Datos Personales</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">NOMBRE</label>
+                            <input type="text" name="first_name" value="<?= htmlspecialchars($userData['first_name'] ?? '') ?>" required style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">APELLIDO</label>
+                            <input type="text" name="last_name" value="<?= htmlspecialchars($userData['last_name'] ?? '') ?>" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">USUARIO</label>
+                        <input type="text" value="<?= htmlspecialchars($userData['name'] ?? '') ?>" readonly style="width: 100%; padding: 0.85rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.03); border-radius: 6px; color: var(--text-muted); cursor: not-allowed;" />
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">DNI</label>
+                            <input type="text" value="<?= htmlspecialchars($userData['dni'] ?? 'No registrado') ?>" readonly style="width: 100%; padding: 0.85rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.03); border-radius: 6px; color: var(--text-muted); cursor: not-allowed;" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">CARGO</label>
+                            <input type="text" value="<?= htmlspecialchars(ucfirst($role)) ?>" readonly style="width: 100%; padding: 0.85rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.03); border-radius: 6px; color: var(--text-muted); cursor: not-allowed;" />
+                        </div>
+                    </div>
+                    
+                    <button type="submit" style="margin-top: 1rem; background: var(--primary); color: #031c37; border: none; border-radius: 6px; padding: 0.85rem 1.75rem; font-weight: 700; cursor: pointer; font-size: 0.95rem; display: inline-block;">Guardar cambios</button>
+                </div>
+
+                <!-- SUBTAB: SEGURIDAD -->
+                <div id="subtabSecurity" style="display: none;">
+                    <h2 style="margin: 0 0 2rem 0; font-size: 1.5rem; color: white;">Seguridad</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Completa los campos solo si deseas cambiar tu contrase&ntilde;a de acceso al sistema.</p>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">CONTRASE&Ntilde;A ACTUAL</label>
+                        <input type="password" name="current_password" placeholder="Contraseña actual" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">NUEVA CONTRASE&Ntilde;A</label>
+                            <input type="password" name="new_password" placeholder="M&iacute;nimo 6 caracteres" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">CONFIRMAR NUEVA CONTRASE&Ntilde;A</label>
+                            <input type="password" name="confirm_password" placeholder="Repite la nueva clave" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        </div>
+                    </div>
+                    
+                    <button type="submit" style="margin-top: 1rem; background: var(--primary); color: #031c37; border: none; border-radius: 6px; padding: 0.85rem 1.75rem; font-weight: 700; cursor: pointer; font-size: 0.95rem; display: inline-block;">Actualizar contrase&ntilde;a</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<?php if ($canManageUsers): ?>
+    <div id="usersTab" class="tab-content" style="display: none; background: transparent; border: none; padding: 0; box-shadow: none;">
+        
+        <div style="background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 2.5rem; margin-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h2 style="margin: 0; font-size: 1.5rem; color: white;">Gesti&oacute;n de Usuarios</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0.25rem 0 0 0;">
+                        Administra roles, accesos y contrase&ntilde;as de los operarios.
+                    </p>
+                </div>
+                <button type="button" style="background: var(--primary); color: #031c37; border: none; border-radius: 6px; padding: 0.85rem 1.75rem; font-weight: 700; cursor: pointer; font-size: 0.95rem;" onclick="toggleCreateUserForm()">+ Crear Nuevo Usuario</button>
+            </div>
+
+            <!-- FORMULARIO NUEVO USUARIO (Desplegable) -->
+            <div id="createUserContainer" style="display: none; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
+                <h3 style="margin: 0 0 1.5rem 0; font-size: 1.25rem; color: white;">Registrar Nuevo Usuario</h3>
+                <form method="POST" action="/opciones">
+                    <input type="hidden" name="action" value="create_user" />
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">USUARIO / LOGIN</label>
+                            <input type="text" name="username" placeholder="ej. jperez" required style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">NOMBRE</label>
+                            <input type="text" name="first_name" placeholder="Juan" required style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">APELLIDO</label>
+                            <input type="text" name="last_name" placeholder="P&eacute;rez" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">CONTRASE&Ntilde;A</label>
+                            <input type="password" name="password" placeholder="M&iacute;nimo 6 caracteres" required style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">CARGO / ROL</label>
+                            <select name="role" required style="width: 100%; padding: 0.85rem; background: #062a50; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; appearance: auto;">
+                                <option value="visualizador">Visualizador (Solo Lectura)</option>
+                                <option value="instructor">Instructor (Administrador)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <button type="button" style="background: transparent; color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 0.75rem 1.5rem; font-weight: 600; cursor: pointer;" onclick="toggleCreateUserForm()">Cancelar</button>
+                        <button type="submit" style="background: var(--primary); color: #031c37; border: none; border-radius: 6px; padding: 0.75rem 1.5rem; font-weight: 700; cursor: pointer;">Crear Usuario</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TABLA DE USUARIOS -->
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">ID</th>
+                            <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Nombre Completo</th>
+                            <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Usuario</th>
+                            <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Cargo / Rol</th>
+                            <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Estado</th>
+                            <th style="padding: 1rem 0.5rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach (($allUsersList ?? []) as $u): ?>
+                            <?php 
+                                $isMaster = ($u['role'] === 'master'); 
+                                $isSelf = ($u['id'] == $_SESSION['user_id']);
+                                $isActive = !empty($u['is_active']);
+                            ?>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 1rem 0.5rem; color: var(--text-muted);">#<?= htmlspecialchars($u['id']) ?></td>
+                                <td style="padding: 1rem 0.5rem;">
+                                    <strong style="color: white;"><?= htmlspecialchars(trim(($u['first_name'] ?? '') . ' ' . ($u['last_name'] ?? '')) ?: $u['name']) ?></strong>
+                                    <?php if ($isSelf): ?>
+                                        <span style="font-size: 0.7rem; color: var(--primary); margin-left: 0.5rem; font-weight: 600; text-transform: uppercase;">(T&uacute;)</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="padding: 1rem 0.5rem;">
+                                    <span style="background: rgba(255,255,255,0.05); padding: 0.25rem 0.5rem; border-radius: 4px; font-family: monospace; color: var(--text-muted);"><?= htmlspecialchars($u['name']) ?></span>
+                                </td>
+                                <td style="padding: 1rem 0.5rem;">
+                                    <?php if ($isMaster): ?>
+                                        <span style="color: #a78bfa; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">&#9733; Master</span>
+                                    <?php else: ?>
+                                        <form method="POST" action="/opciones" style="display: inline-block; margin: 0;">
+                                            <input type="hidden" name="action" value="update_role" />
+                                            <input type="hidden" name="target_user_id" value="<?= $u['id'] ?>" />
+                                            <select name="new_role" onchange="this.form.submit()" style="padding: 0.35rem 0.5rem; font-size: 0.85rem; border-radius: 6px; background: #062a50; color: white; border: 1px solid rgba(255,255,255,0.1); outline: none;">
+                                                <option value="instructor" <?= $u['role'] === 'instructor' ? 'selected' : '' ?>>Instructor</option>
+                                                <option value="visualizador" <?= $u['role'] === 'visualizador' ? 'selected' : '' ?>>Visualizador</option>
+                                            </select>
+                                        </form>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="padding: 1rem 0.5rem;">
+                                    <?php if ($isActive): ?>
+                                        <span style="color: #34d399; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Activo</span>
+                                    <?php else: ?>
+                                        <span style="color: #f87171; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Bloqueado</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="padding: 1rem 0.5rem; text-align: right;">
+                                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                        <?php if (!$isMaster && !$isSelf): ?>
+                                            <form method="POST" action="/opciones" style="display: inline; margin: 0;">
+                                                <input type="hidden" name="action" value="toggle_status" />
+                                                <input type="hidden" name="target_user_id" value="<?= $u['id'] ?>" />
+                                                <?php if ($isActive): ?>
+                                                    <button type="submit" style="background: transparent; border: 1px solid #f87171; color: #f87171; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem; cursor: pointer;" onclick="return confirm('¿Deseas bloquear a este usuario?')">Bloquear</button>
+                                                <?php else: ?>
+                                                    <button type="submit" style="background: transparent; border: 1px solid #34d399; color: #34d399; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem; cursor: pointer;">Desbloquear</button>
+                                                <?php endif; ?>
+                                            </form>
+                                        <?php endif; ?>
+
+                                        <?php if (!$isMaster || $role === 'master'): ?>
+                                            <button type="button" style="background: transparent; border: 1px solid #60a5fa; color: #60a5fa; border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem; cursor: pointer;" onclick="promptResetPassword(<?= $u['id'] ?>, '<?= htmlspecialchars($u['name']) ?>')">Clave</button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Form Oculto para Resetear Contrasena -->
+            <form id="resetPasswordForm" method="POST" action="/opciones" style="display: none;">
+                <input type="hidden" name="action" value="reset_password" />
+                <input type="hidden" id="reset_target_user_id" name="target_user_id" value="" />
+                <input type="hidden" id="reset_new_password" name="new_password" value="" />
+            </form>
+
+        </div>
+    </div>
+<?php endif; ?>
+
+    <!-- PESTAÑA 3: LÍMITES DE REACCIÓN -->
+    <!-- <?php if ($canManageUsers): ?>
+    <div id="settingsTab" class="tab-content" style="display: none;">
+        <h3 style="margin-top: 0; color: var(--text-main); font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+            Configuración de Umbrales de Reacción (0 a 8.000 ms)
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">
+            Define los valores en milisegundos para clasificar el desempeño. El límite máximo de tiempo de espera (timeout) está fijado en 8.000 ms (8 segundos). El límite de acierto y el límite de fallo no pueden ser iguales.
+        </p>
+
+        <form method="POST" action="/opciones" style="max-width: 550px; margin-top: 1.5rem;">
+            <input type="hidden" name="action" value="update_settings" />
+
+            <div class="form-group">
+                <label for="fast_threshold_ms">Límite de Acierto / Rápido (&lt; ms)</label>
+                <input type="number" id="fast_threshold_ms" name="fast_threshold_ms" value="<?= (int)($systemSettings['fast_threshold_ms'] ?? 300) ?>" min="0" max="8000" required />
+                <small style="color: var(--text-muted);">Reacciones por debajo de este valor son rápidas (ej. 300 ms).</small>
+            </div>
+
+            <div class="form-group">
+                <label for="slow_threshold_ms">Límite de Fallo / Lento (&gt; ms)</label>
+                <input type="number" id="slow_threshold_ms" name="slow_threshold_ms" value="<?= (int)($systemSettings['slow_threshold_ms'] ?? 450) ?>" min="0" max="8000" required />
+                <small style="color: var(--text-muted);">Reacciones por encima de este valor se consideran lentas. Debe ser mayor al límite de acierto.</small>
+            </div>
+
+            <div class="form-group">
+                <label>Límite Superior (Timeout del Sistema)</label>
+                <input type="text" value="8.000 ms (8,00 seg)" readonly style="opacity: 0.7; cursor: not-allowed; background: rgba(0,0,0,0.3);" />
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn">Guardar Umbrales de Reacción</button>
+            </div>
+        </form>
+    </div>
+    <?php endif; ?> -->
+
+</div>
+
+<script src="/js/opciones.js"></script>
+
+<?php require __DIR__ . '/layout/footer.html'; ?>

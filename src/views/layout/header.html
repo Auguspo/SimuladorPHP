@@ -25,7 +25,7 @@ if ($initials === '') {
     <title><?= htmlspecialchars($pageTitle ?? 'Simulador Telemetría') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
     <script src="/js/formatters.js?v=<?= time() ?>"></script>
     <script src="/js/statusModal_v2.js?v=<?= time() ?>"></script>
@@ -33,7 +33,7 @@ if ($initials === '') {
 <body>
     <div class="topbar">
         <div style="display: flex; align-items: center; gap: 1rem;">
-            <div class="brand">SIMULADOR</div>
+            <a href="/"><img src="/assets/img/Simulador%20fluo.svg" alt="Simulador Logo" class="header-logo" /></a>
         </div>
         <nav class="nav">
             <a href="/" class="<?= ($activeMenu ?? '') === 'home' ? 'active' : '' ?>">Sesiones</a>

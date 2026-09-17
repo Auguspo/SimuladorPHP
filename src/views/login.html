@@ -6,14 +6,19 @@
     <title>Login - Simulador Telemetría</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body class="login-container">
-    <div class="card login-card">
-        <div class="login-header">
-            <h1 class="brand" style="font-size: 1.75rem;">SIMULADOR</h1>
-            <p style="color: var(--text-muted); margin-top: 0.5rem;">Ingreso al Panel de Control</p>
+    <header style="position: absolute; top: 0; left: 0; right: 0; padding: 2rem; display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box; z-index: 10;">
+        <img src="/assets/img/Logo%20negativo.svg" alt="Logo Negativo" style="height: 45px; width: auto;" />
+        <button type="button" style="background: none; border: none; cursor: pointer; padding: 0.5rem; display: flex; align-items: center; justify-content: center;">
+            <img src="/assets/icons/menuWhite.svg" alt="Menu" style="height: 32px; width: 32px;" />
+        </button>
+    </header>
+    <div class="card login-card ">
+                <div class="login-header py-4" style="display: flex; justify-content: center; padding-bottom: 1.5rem; margin-top: 1.5rem;">
+            <img src="/assets/img/Simulador%20balnco.svg" alt="Simulador Logo" style="max-width: 320px; width: 100%; height: auto;" />
         </div>
         
         <?php if (!empty($error)): ?>

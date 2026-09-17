@@ -53,7 +53,7 @@ class AuthController {
             }
         }
 
-        require PROJECT_ROOT . '/src/views/login.php';
+        require PROJECT_ROOT . '/src/views/login.html';
     }
 
     public function logout() {

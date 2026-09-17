@@ -6,7 +6,7 @@ class PageController
 {
     private function render(string $viewPath): void
     {
-        require_once PROJECT_ROOT . '/src/views/' . $viewPath . '.php';
+        require_once PROJECT_ROOT . '/src/views/' . $viewPath . '.html';
     }
 
     public function home(): void
