@@ -1,8 +1,8 @@
 :root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --bg: #0f172a;
-    --card-bg: #1e293b;
+    --primary: #71ff00;
+    --primary-hover: #5cdb00;
+    --bg: #031C37;
+    --card-bg: #062a50;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --border: #334155;
@@ -21,7 +21,7 @@ html {
 }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
     margin: 0;
     padding: 0;
     background-color: var(--bg);
@@ -51,6 +51,8 @@ body {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -73,19 +75,25 @@ body {
     align-items: center;
 }
 
+
+
 .nav a {
     color: var(--text-muted);
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
     padding: 0.5rem 1rem;
-    border-radius: 8px;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
     white-space: nowrap;
 }
-
-.nav a:hover, .nav a.active {
+.nav a:hover {
     color: var(--text-main);
-    background: rgba(255, 255, 255, 0.08);
+}
+.nav a.active {
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+    background: transparent;
 }
 
 .nav .logout {
@@ -179,7 +187,7 @@ input[type="text"], input[type="password"], input[type="date"], input[type="numb
 input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 3px rgba(113, 255, 0, 1);
 }
 
 .nowrap {
@@ -193,7 +201,7 @@ input:focus {
     justify-content: center;
     padding: 0.75rem 1.5rem;
     background: var(--primary);
-    color: white;
+    color: var(--bg);
     border: none;
     border-radius: 8px;
     font-weight: 600;
@@ -220,14 +228,16 @@ input:focus {
     justify-content: center;
     padding: 1rem;
     box-sizing: border-box;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(rgba(3, 28, 55, 0.6), rgba(3, 28, 55, 0.6)), url('/assets/background/background.png') no-repeat center center fixed;
+    background-size: cover;
 }
 
 .login-card {
     width: 100%;
     max-width: 400px;
-    background: rgba(30, 41, 59, 0.8);
+    background: rgba(6, 42, 80, 0.8);
     backdrop-filter: blur(20px);
+    border: 1px solid #ffffff;
 }
 
 .login-header {
@@ -399,8 +409,9 @@ select:focus {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    color: #ffffff;
+    background: var(--primary);
+    color: #031C37;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -415,8 +426,9 @@ select:focus {
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-    color: #ffffff;
+    background: var(--primary);
+    color: #031C37;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -572,5 +584,44 @@ select:focus {
                  m a r g i n :   1 . 5 c m ; 
          } 
  } 
-  
  
+ 
+ 
+/* Typography Updates */
+h1 {
+    font-weight: 700;
+}
+h2, h3, h4, h5, h6, .subtitle {
+    font-weight: 400;
+    text-transform: uppercase;
+}
+p, span, div, input, button {
+    font-weight: 400;
+}
+
+input::placeholder { color: #ffffff; opacity: 1; }
+input { color: #ffffff !important; }
+
+/* Checkboxes and Radios */
+input[type="checkbox"], input[type="radio"] {
+    accent-color: var(--primary);
+
+    cursor: pointer;
+}
+
+
+
+
+
+/* Responsive Logo */
+.topbar img.header-logo {
+    height: 40px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    display: block;
+}
+@media (max-width: 768px) {
+    .topbar img.header-logo {
+        height: 28px !important;
+    }
+}

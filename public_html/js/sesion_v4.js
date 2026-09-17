@@ -37,18 +37,18 @@ async function loadSession() {
         }
 
         currentSessionData = json.session;
-        status.textContent = `Sesión #${escapeHtml(json.session.id || sessionId)} cargada.`;
+        status.textContent = `Sesión #${escapeHtml(json.session.id || sessionId)}`;
         container.innerHTML = renderSession(json.session, deletedFilter);
         
         const canEdit = (window.CURRENT_USER_ROLE === 'instructor' || window.CURRENT_USER_ROLE === 'master');
         const editBtn = document.getElementById('btnEditSession');
         if (editBtn) {
-            editBtn.style.display = canEdit ? 'inline-block' : 'none';
+            editBtn.style.display = canEdit ? 'inline-flex' : 'none';
         }
         
         const scoringBtn = document.getElementById('btnScoring');
         if (scoringBtn) {
-            scoringBtn.style.display = canEdit ? 'inline-block' : 'none';
+            scoringBtn.style.display = canEdit ? 'inline-flex' : 'none';
         }
         
         const exportScoringBtn = document.getElementById('btnExportScoring');
@@ -104,7 +104,7 @@ function renderSession(session, deletedFilter) {
                         </span>
                         ${isDeleted ? '<span class="badge badge-blocked" style="margin-left: 0.5rem;">BORRADO</span>' : ''}
                     </td>
-                    <td data-label="Tiempo (ms)">${formatIntAR(event.time_ms)} ms</td>
+                    <td data-label="Tiempo">${formatNumberAR(event.time_ms / 1000, 2)} s</td>
                     ${canEdit ? `<td data-label="Acciones" style="text-align: right;">${actionBtn}</td>` : ''}
                 </tr>
             `;
@@ -113,43 +113,81 @@ function renderSession(session, deletedFilter) {
 
     return `
         <!-- METRICAS DE SESION -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin-top: 1rem;">
-            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
-                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">Conductor</label>
-                <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">${escapeHtml(session.participant_name)}</span>
-                <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">DNI: ${escapeHtml(session.participant_dni)}</div>
-            </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
             
-            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
-                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">Fecha de prueba</label>
-                <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">${formatDateAR(session.tested_at)}</span>
-            </div>
-            
-            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
-                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">Demografía</label>
-                <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Edad: ${session.participant_age ?? '-'}</span>
-                <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">Peso: ${session.participant_weight_kg !== null ? formatNumberAR(session.participant_weight_kg, 2) + ' kg' : '-'}</div>
-            </div>
-            
-            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; justify-content: center; flex-direction: column;">
-                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">Puntaje Sesion</label>
-                <span style="font-size: 2.5rem; font-weight: 700; color: ${session.instructor_score !== null ? 'var(--primary)' : 'var(--text-muted)'}; line-height: 1;">${session.instructor_score ?? '-'}</span>
-            </div>
-            
-            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
-                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">Métricas de Embrague</label>
-                <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">${session.clutch_count ?? '-'} acciones</span>
-                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;" class="nowrap">
-                    Tiempo total: <span class="nowrap" style="color: var(--text-main); font-weight: 500;">${session.clutch_total_time_s !== null ? formatNumberAR(session.clutch_total_time_s, 2) + ' s' : '-'}</span>
+            <!-- Conductor -->
+            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                <div style="flex-shrink: 0; width: 40px; display: flex; justify-content: center;">
+                    <img src="/assets/icons/personaWhite.svg" style="width: 32px; height: 32px; opacity: 0.9;" />
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.1rem;">Conductor</label>
+                    <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">${escapeHtml(session.participant_name)}</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">DNI: ${escapeHtml(session.participant_dni)}</span>
                 </div>
             </div>
             
-            <div style="grid-column: 1 / -1; background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
-                <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">Comentario</label>
-                <span style="font-size: 1rem; color: var(--text-main);">${escapeHtml(session.participant_comment || 'Sin comentario')}</span>
+            <!-- Fecha -->
+            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                <div style="flex-shrink: 0; width: 40px; display: flex; justify-content: center;">
+                    <img src="/assets/icons/calendarioWhite.svg" style="width: 32px; height: 32px; opacity: 0.9;" />
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.1rem;">Fecha de prueba</label>
+                    <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">${formatDateAR(session.tested_at)}</span>
+                </div>
             </div>
+            
+            <!-- Demografia -->
+            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                <div style="flex-shrink: 0; width: 40px; display: flex; justify-content: center;">
+                    <img src="/assets/icons/group.svg" style="width: 32px; height: 32px; opacity: 0.9;" />
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.1rem;">Demograf&iacute;a</label>
+                    <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Edad: ${session.participant_age ?? '-'}</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Peso: ${session.participant_weight_kg !== null ? formatNumberAR(session.participant_weight_kg, 2) + ' kg' : '-'}</span>
+                </div>
+            </div>
+            
+            <!-- Puntaje -->
+            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-right: 6px solid var(--primary); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem; position: relative;">
+                <div style="flex-shrink: 0; width: 40px; display: flex; justify-content: center;">
+                    <img src="/assets/icons/velocimetroWhite.svg" style="width: 32px; height: 32px; opacity: 0.9;" />
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.1rem;">Puntaje Sesi&oacute;n</label>
+                    <div style="display: flex; align-items: baseline; gap: 0.3rem;">
+                        <span style="font-size: 2rem; font-weight: 700; color: ${session.instructor_score !== null ? 'var(--primary)' : 'var(--text-muted)'}; line-height: 1;">${session.instructor_score ?? '-'}</span>
+                        <span style="font-size: 1rem; color: var(--text-main); font-weight: 500;">/ 55</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Embrague -->
+            <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                <div style="flex-shrink: 0; width: 40px; display: flex; justify-content: center;">
+                    <img src="/assets/icons/frenoWhite.svg" style="width: 32px; height: 32px; opacity: 0.9;" />
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.1rem;">M&eacute;tricas de Embrague</label>
+                    <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-main);">${session.clutch_count ?? '-'} acciones</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Tiempo total: <span style="color: var(--text-main); font-weight: 500;">${session.clutch_total_time_s !== null ? formatNumberAR(session.clutch_total_time_s, 2) + ' s' : '-'}</span></span>
+                </div>
+            </div>
+            
+            <!-- Comentario -->
+            <div style="grid-column: 1 / -1; background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                <div style="flex-shrink: 0; width: 40px; display: flex; justify-content: center;">
+                    <img src="/assets/icons/chatWhite.svg" style="width: 32px; height: 32px; opacity: 0.9;" />
+                </div>
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                    <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.1rem;">Comentario</label>
+                    <span style="font-size: 1rem; color: var(--text-main); line-height: 1.4;">${escapeHtml(session.participant_comment || 'Sin comentario')}</span>
+                </div>
+            </div>
+            
         </div>
-
         <!-- BARRA DE EVENTOS & FILTRO Y/N/ALL -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
             <h2 style="margin: 0; font-size: 1.25rem;">Eventos de Reacción</h2>
@@ -172,7 +210,7 @@ function renderSession(session, deletedFilter) {
                         <th>Estímulo</th>
                         <th>Tracción</th>
                         <th>Resultado</th>
-                        <th>Tiempo (ms)</th>
+                        <th>Tiempo (s)</th>
                         ${canEdit ? '<th style="text-align: right;">Acciones</th>' : ''}
                     </tr>
                 </thead>
@@ -348,7 +386,7 @@ async function openScoringModal() {
     
     // Check role before allowing edits
     const canEdit = (window.CURRENT_USER_ROLE === 'instructor' || window.CURRENT_USER_ROLE === 'admin' || window.CURRENT_USER_ROLE === 'master');
-    document.getElementById('btnSaveScoring').style.display = canEdit ? 'inline-block' : 'none';
+    document.getElementById('btnSaveScoring').style.display = canEdit ? 'inline-flex' : 'none';
     
     // Clear current form
     document.getElementById('scoringForm').reset();
@@ -421,7 +459,7 @@ async function submitScoring(e) {
         window.statusModal('Error', 'Error de conexión', true);
     } finally {
         btn.disabled = false;
-        btn.textContent = 'Guardar Scoring';
+        btn.innerHTML = '<img src="/assets/icons/star.svg" style="width: 14px; height: 14px; filter: brightness(0) invert(1); display: block;" /><span>Guardar Scoring</span>';
     }
     });
 }

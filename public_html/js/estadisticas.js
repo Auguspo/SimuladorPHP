@@ -179,8 +179,8 @@ function renderDashboard(data) {
 
             <div style="background: rgba(15,23,42,0.6); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
                 <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Reacción Promedio</div>
-                <div style="font-size: 2rem; font-weight: 700; color: #a78bfa; margin-top: 0.25rem;" class="nowrap">${formatNumberAR(k.avg_reaction_ms, 1)} <span style="font-size: 1rem; font-weight: 400;">ms</span></div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;" class="nowrap">Récord mínimo: <b style="color: #34d399;">${k.min_reaction_ms} ms</b></div>
+                <div style="font-size: 2rem; font-weight: 700; color: #a78bfa; margin-top: 0.25rem;" class="nowrap">${formatNumberAR((k.avg_reaction_ms || 0) / 1000, 2)} <span style="font-size: 1rem; font-weight: 400;">s</span></div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;" class="nowrap">Récord mínimo: <b style="color: #34d399;">${formatNumberAR((k.min_reaction_ms || 0) / 1000, 2)} s</b></div>
             </div>
 
             <div style="background: rgba(15,23,42,0.6); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
@@ -201,23 +201,23 @@ function renderDashboard(data) {
 
             <!-- Multi-color Progress Bar -->
             <div style="display: flex; height: 16px; border-radius: 999px; overflow: hidden; background: rgba(0,0,0,0.3); margin-bottom: 1rem;">
-                <div style="width: ${fastPct}%; background: #34d399;" title="Rápido (<${t.fast_ms}ms): ${ranges.fast}"></div>
-                <div style="width: ${normalPct}%; background: #60a5fa;" title="Normal (${t.fast_ms}-${t.slow_ms}ms): ${ranges.normal}"></div>
-                <div style="width: ${slowPct}%; background: #f87171;" title="Lento (>${t.slow_ms}ms): ${ranges.slow}"></div>
+                <div style="width: ${fastPct}%; background: #34d399;" title="RApido (<${formatNumberAR(t.fast_ms/1000, 2)}s): ${ranges.fast}"></div>
+                <div style="width: ${normalPct}%; background: #60a5fa;" title="Normal (${formatNumberAR(t.fast_ms/1000, 2)}-${formatNumberAR(t.slow_ms/1000, 2)}s): ${ranges.normal}"></div>
+                <div style="width: ${slowPct}%; background: #f87171;" title="Lento (>${formatNumberAR(t.slow_ms/1000, 2)}s): ${ranges.slow}"></div>
             </div>
 
             <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.85rem;">
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <div style="width: 12px; height: 12px; border-radius: 50%; background: #34d399;"></div>
-                    <span>Rápido (&lt;${t.fast_ms} ms): <b>${ranges.fast}</b> (${fastPct}%)</span>
+                    <span>RApido (&lt;${formatNumberAR(t.fast_ms/1000, 2)} s): <b>${ranges.fast}</b> (${fastPct}%)</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <div style="width: 12px; height: 12px; border-radius: 50%; background: #60a5fa;"></div>
-                    <span>Normal (${t.fast_ms}–${t.slow_ms} ms): <b>${ranges.normal}</b> (${normalPct}%)</span>
+                    <span>Normal (${formatNumberAR(t.fast_ms/1000, 2)} - ${formatNumberAR(t.slow_ms/1000, 2)} s): <b>${ranges.normal}</b> (${normalPct}%)</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <div style="width: 12px; height: 12px; border-radius: 50%; background: #f87171;"></div>
-                    <span>Lento (&gt;${t.slow_ms} ms): <b>${ranges.slow}</b> (${slowPct}%)</span>
+                    <span>Lento (&gt;${formatNumberAR(t.slow_ms/1000, 2)} s): <b>${ranges.slow}</b> (${slowPct}%)</span>
                 </div>
             </div>
         </div>
@@ -235,7 +235,7 @@ function renderDashboard(data) {
                             <tr>
                                 <th>Conductor</th>
                                 <th>Pruebas</th>
-                                <th>Avg (ms)</th>
+                                <th>Avg (s)</th>
                                 <th>Mín (ms)</th>
                                 <th>Precisión</th>
                             </tr>
@@ -258,7 +258,7 @@ function renderDashboard(data) {
                             <tr>
                                 <th>Estímulo</th>
                                 <th>Evaluaciones</th>
-                                <th>Promedio (ms)</th>
+                                <th>Promedio (s)</th>
                                 <th>Aciertos</th>
                             </tr>
                         </thead>
@@ -281,16 +281,16 @@ function renderLeaderboard(drivers) {
 
     return drivers.map((d, index) => {
         const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
-        const avg = formatNumberAR(parseFloat(d.avg_reaction_ms) || 0, 1);
-        const best = Math.round(parseFloat(d.best_reaction_ms) || 0);
+        const avg = formatNumberAR((parseFloat(d.avg_reaction_ms) || 0) / 1000, 2);
+        const best = formatNumberAR((parseFloat(d.best_reaction_ms) || 0) / 1000, 2);
         const acc = formatNumberAR(parseFloat(d.accuracy_pct) || 0, 1);
 
         return `
             <tr>
                 <td data-label="Conductor"><b>${medal}</b> ${escapeHtml(d.name)}</td>
                 <td data-label="Pruebas">${d.sessions_count}</td>
-                <td data-label="Avg (ms)"><b style="color: #a78bfa;">${avg} ms</b></td>
-                <td data-label="Mín (ms)"><span style="color: #34d399;">${best} ms</span></td>
+                <td data-label="Avg (ms)"><b style="color: #a78bfa;">${avg} s</b></td>
+                <td data-label="Mín (ms)"><span style="color: #34d399;">${best} s</span></td>
                 <td data-label="Precisión"><span class="badge ${parseFloat(d.accuracy_pct) >= 80 ? 'badge-active' : 'badge-blocked'}">${acc}%</span></td>
             </tr>
         `;
@@ -307,7 +307,7 @@ function renderStimulusBreakdown(list) {
         const aciertos = parseInt(s.aciertos) || 0;
         const pctVal = count > 0 ? (aciertos / count) * 100 : 0;
         const pctStr = formatNumberAR(pctVal, 1);
-        const avg = formatNumberAR(parseFloat(s.avg_ms) || 0, 1);
+        const avg = formatNumberAR((parseFloat(s.avg_ms) || 0) / 1000, 2);
 
         return `
             <tr>
