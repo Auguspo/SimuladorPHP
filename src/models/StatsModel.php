@@ -8,18 +8,11 @@ class StatsModel extends BaseModel
 {
     public function getSettings(): array
     {
-        $settingsStmt = $this->pdo->query('SELECT setting_key, setting_value FROM system_settings');
-        $sysSettings = [
+        return [
             'fast_threshold_ms' => 300,
             'slow_threshold_ms' => 450,
             'max_timeout_ms' => 8000
         ];
-        if ($settingsStmt) {
-            while ($row = $settingsStmt->fetch(PDO::FETCH_ASSOC)) {
-                $sysSettings[$row['setting_key']] = (int)$row['setting_value'];
-            }
-        }
-        return $sysSettings;
     }
 
     private function buildWhereClause(?int $participantId, ?string $fromDate, ?string $toDate, string $deletedFilter, array &$params): string

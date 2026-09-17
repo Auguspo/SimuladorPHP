@@ -244,18 +244,11 @@ class UserController {
     }
 
     public function getSettings(): array {
-        $pdo = db();
-        $stmt = $pdo->query('SELECT setting_key, setting_value FROM system_settings');
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        $settings = [
+        return [
             'fast_threshold_ms' => 300,
             'slow_threshold_ms' => 450,
             'max_timeout_ms' => 8000,
         ];
-        foreach ($rows as $row) {
-            $settings[$row['setting_key']] = (int)$row['setting_value'];
-        }
-        return $settings;
     }
 
     public function handleUpdateSettings(): array {
