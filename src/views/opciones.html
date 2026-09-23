@@ -124,7 +124,7 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
 
             </form>
 
-            <form method="POST" action="/opciones">
+            <form method="POST" action="/opciones" id="updatePasswordForm" onsubmit="return validatePasswordUpdate(this)">
                 <input type="hidden" name="action" value="update_password" />
                 <!-- SUBTAB: SEGURIDAD -->
                 <div id="subtabSecurity" style="display: none;">

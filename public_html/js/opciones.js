@@ -52,3 +52,27 @@ function promptResetPassword(userId, username) {
         alert('La contraseÃ±a debe tener al menos 6 caracteres.');
     }
 }
+
+function validatePasswordUpdate(form) {
+    const current = form.current_password.value;
+    const newPwd = form.new_password.value;
+    const confirmPwd = form.confirm_password.value;
+
+    if (!current || !newPwd || !confirmPwd) {
+        alert('? Todos los campos son obligatorios para cambiar la contraseña.');
+        return false;
+    }
+    
+    if (newPwd.length < 6) {
+        alert('? La nueva contraseña debe tener al menos 6 caracteres.');
+        return false;
+    }
+
+    if (newPwd !== confirmPwd) {
+        alert('? La nueva contraseña y su confirmación no coinciden.');
+        return false;
+    }
+
+    return true;
+}
+
