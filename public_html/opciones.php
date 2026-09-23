@@ -21,6 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $errorMessage = $result['error'];
         }
+    } elseif ($action === 'update_password') {
+        $result = $userController->handleUpdatePassword();
+        if ($result['ok']) {
+            $successMessage = $result['message'];
+        } else {
+            $errorMessage = $result['error'];
+        }
     } elseif ($action === 'create_user') {
         $result = $userController->handleCreateUser();
         if ($result['ok']) {

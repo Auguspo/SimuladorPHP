@@ -122,6 +122,10 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
                     <button type="submit" style="margin-top: 1rem; background: var(--primary); color: #031c37; border: none; border-radius: 6px; padding: 0.85rem 1.75rem; font-weight: 700; cursor: pointer; font-size: 0.95rem; display: inline-block;">Guardar cambios</button>
                 </div>
 
+            </form>
+
+            <form method="POST" action="/opciones">
+                <input type="hidden" name="action" value="update_password" />
                 <!-- SUBTAB: SEGURIDAD -->
                 <div id="subtabSecurity" style="display: none;">
                     <h2 style="margin: 0 0 2rem 0; font-size: 1.5rem; color: white;">Seguridad</h2>

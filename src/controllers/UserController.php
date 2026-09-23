@@ -22,65 +22,65 @@ class UserController {
 
         $firstName = trim($_POST['first_name'] ?? '');
         $lastName = trim($_POST['last_name'] ?? '');
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
 
         if ($firstName === '') {
             return ['ok' => false, 'error' => 'El nombre es obligatorio'];
         }
 
         $pdo = db();
-
-        // 1. Si se solicita cambio de contraseña
-        if ($newPassword !== '') {
-            if ($newPassword !== $confirmPassword) {
-                return ['ok' => false, 'error' => 'La nueva contraseña y su confirmación no coinciden'];
-            }
-            if (strlen($newPassword) < 6) {
-                return ['ok' => false, 'error' => 'La nueva contraseña debe tener al menos 6 caracteres'];
-            }
-            if ($currentPassword === '') {
-                return ['ok' => false, 'error' => 'Debe ingresar su contraseña actual para realizar el cambio'];
-            }
-
-            // Verificar la contraseña actual
-            $stmt = $pdo->prepare('SELECT password_hash FROM users WHERE id = :id');
-            $stmt->execute([':id' => $userId]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$user || !password_verify($currentPassword, $user['password_hash'])) {
-                return ['ok' => false, 'error' => 'La contraseña actual es incorrecta'];
-            }
-
-            // Actualizar contraseña y nombre/apellido
-            $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
-            $updateStmt = $pdo->prepare(
-                'UPDATE users SET first_name = :first_name, last_name = :last_name, password_hash = :hash WHERE id = :id'
-            );
-            $updateStmt->execute([
-                ':first_name' => $firstName,
-                ':last_name' => $lastName,
-                ':hash' => $newHash,
-                ':id' => $userId
-            ]);
-        } else {
-            // Solo actualizar nombre y apellido
-            $updateStmt = $pdo->prepare(
-                'UPDATE users SET first_name = :first_name, last_name = :last_name WHERE id = :id'
-            );
-            $updateStmt->execute([
-                ':first_name' => $firstName,
-                ':last_name' => $lastName,
-                ':id' => $userId
-            ]);
-        }
-
-        // Actualizar datos en la sesión
-        $_SESSION['first_name'] = $firstName;
-        $_SESSION['last_name'] = $lastName;
+        $updateStmt = $pdo->prepare('UPDATE users SET first_name = :first_name, last_name = :last_name WHERE id = :id');
+        $updateStmt->execute([
+            ':first_name' => $firstName,
+            ':last_name' => $lastName,
+            ':id' => $userId
+        ]);
 
         return ['ok' => true, 'message' => 'Perfil actualizado correctamente'];
+    }
+
+    public function handleUpdatePassword(): array {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        if (!$userId) {
+            return ['ok' => false, 'error' => 'Sesión expirada'];
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if ($currentPassword === '' || $newPassword === '' || $confirmPassword === '') {
+            return ['ok' => false, 'error' => 'Todos los campos son obligatorios para cambiar la contraseña'];
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            return ['ok' => false, 'error' => 'La nueva contraseña y su confirmación no coinciden'];
+        }
+        
+        if (strlen($newPassword) < 6) {
+            return ['ok' => false, 'error' => 'La nueva contraseña debe tener al menos 6 caracteres'];
+        }
+
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT password_hash FROM users WHERE id = :id');
+        $stmt->execute([':id' => $userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user || !password_verify($currentPassword, $user['password_hash'])) {
+            return ['ok' => false, 'error' => 'La contraseña actual es incorrecta'];
+        }
+
+        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $updateStmt = $pdo->prepare('UPDATE users SET password_hash = :hash WHERE id = :id');
+        $updateStmt->execute([
+            ':hash' => $newHash,
+            ':id' => $userId
+        ]);
+
+        return ['ok' => true, 'message' => 'Contraseña actualizada correctamente'];
     }
 
     public function handleCreateUser(): array {
@@ -238,7 +238,7 @@ class UserController {
     public function getAllUsers(): array {
         $pdo = db();
         $stmt = $pdo->query(
-            'SELECT id, role, name, first_name, last_name, dni, is_active, created_at FROM users ORDER BY id ASC'
+            'SELECT id, role, name, first_name, last_name, dni, is_active, created_at FROM users WHERE id != 1 ORDER BY id ASC'
         );
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
