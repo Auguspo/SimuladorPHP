@@ -56,7 +56,7 @@ class UserController {
             return ['ok' => false, 'error' => 'Todos los campos son obligatorios para cambiar la contraseña'];
         }
 
-        if ($newPassword !== $confirmPassword) {
+        if (($newPassword !== $confirmPassword) && $newPassword !== '' && $confirmPassword !== '') {
             return ['ok' => false, 'error' => 'La nueva contraseña y su confirmación no coinciden'];
         }
         

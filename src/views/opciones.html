@@ -124,7 +124,7 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
 
             </form>
 
-            <form method="POST" action="/opciones" id="updatePasswordForm" onsubmit="return validatePasswordUpdate(this)">
+            <form method="POST" action="/opciones" id="updatePasswordForm" onsubmit="return validatePasswordUpdate(this)" oninput="document.getElementById('passwordErrorMsg').style.display='none'" autocomplete="off">
                 <input type="hidden" name="action" value="update_password" />
                 <!-- SUBTAB: SEGURIDAD -->
                 <div id="subtabSecurity" style="display: none;">
@@ -133,19 +133,25 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
 
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">CONTRASE&Ntilde;A ACTUAL</label>
-                        <input type="password" name="current_password" placeholder="Contraseña actual" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                        <input type="password" name="current_password" autocomplete="new-password" placeholder="Contraseña actual" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
                         <div>
                             <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">NUEVA CONTRASE&Ntilde;A</label>
-                            <input type="password" name="new_password" placeholder="M&iacute;nimo 6 caracteres" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                            <input type="password" name="new_password" autocomplete="new-password" placeholder="M&iacute;nimo 6 caracteres" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
                         </div>
                         <div>
                             <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; letter-spacing: 0.05em;">CONFIRMAR NUEVA CONTRASE&Ntilde;A</label>
-                            <input type="password" name="confirm_password" placeholder="Repite la nueva clave" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
+                            <input type="password" name="confirm_password" autocomplete="new-password" placeholder="Repite la nueva clave" style="width: 100%; padding: 0.85rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'" />
                         </div>
                     </div>
+                    <?php if (!empty($successMessage) && ($_POST['action'] ?? '') === 'update_password'): ?>
+                    <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.85rem; font-weight: 600;">
+                        &#10003; <?= htmlspecialchars($successMessage) ?>
+                    </div>
+                    <?php endif; ?>
+                    <div id="passwordErrorMsg" style="display: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.85rem; font-weight: 600;"></div>
                     
                     <button type="submit" style="margin-top: 1rem; background: var(--primary); color: #031c37; border: none; border-radius: 6px; padding: 0.85rem 1.75rem; font-weight: 700; cursor: pointer; font-size: 0.95rem; display: inline-block;">Actualizar contrase&ntilde;a</button>
                 </div>
@@ -293,7 +299,7 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
             <form id="resetPasswordForm" method="POST" action="/opciones" style="display: none;">
                 <input type="hidden" name="action" value="reset_password" />
                 <input type="hidden" id="reset_target_user_id" name="target_user_id" value="" />
-                <input type="hidden" id="reset_new_password" name="new_password" value="" />
+                <input type="hidden" id="reset_new_password" name="new_password" autocomplete="new-password" value="" />
             </form>
 
         </div>
@@ -341,4 +347,12 @@ $canManageUsers = ($role === 'master' || $role === 'instructor');
 
 <script src="/js/opciones.js?v=<?= time() ?>"></script>
 
+
+<?php if (($_POST['action'] ?? '') === 'update_password'): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        switchProfileSubTab('security');
+    });
+</script>
+<?php endif; ?>
 <?php require __DIR__ . '/layout/footer.html'; ?>
