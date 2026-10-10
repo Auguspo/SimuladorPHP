@@ -27,6 +27,7 @@ class SessionModel extends BaseModel
              JOIN participants p ON p.id = s.participant_id
              LEFT JOIN clutch_metrics cm ON cm.session_id = s.id
              LEFT JOIN session_scorings ss ON s.id = ss.session_id
+             WHERE p.deleted = \'N\'
              ORDER BY s.tested_at DESC, s.id DESC
              LIMIT :limit'
         );
@@ -58,7 +59,7 @@ class SessionModel extends BaseModel
 
     public function getByIdOrExternal(string $sessionId): ?array
     {
-        $stmt = $this->pdo->prepare('
+        $stmt = $this->pdo->prepare("
             SELECT s.id, s.external_id, s.tested_at, s.participant_age, s.participant_weight_kg, s.participant_comment,
                    ss.totalScore AS instructor_score,
                    p.name AS participant_name, p.dni AS participant_dni,
@@ -68,7 +69,7 @@ class SessionModel extends BaseModel
             LEFT JOIN session_scorings ss ON s.id = ss.session_id
             LEFT JOIN clutch_metrics c ON s.id = c.session_id
             WHERE s.id = :id OR s.external_id = :external_id
-        ');
+        ");
         
         $idInt = ctype_digit($sessionId) ? (int)$sessionId : 0;
         
@@ -116,13 +117,13 @@ class SessionModel extends BaseModel
 
     public function update(int $id, ?int $age, ?float $weight, ?string $comment, ?int $instructorScore = null): void
     {
-        $stmt = $this->pdo->prepare('
+        $stmt = $this->pdo->prepare("
             UPDATE sessions 
             SET participant_age = :age,
                 participant_weight_kg = :weight,
                 participant_comment = :comment
             WHERE id = :id
-        ');
+        ");
         $stmt->execute([
             ':id' => $id,
             ':age' => $age,
@@ -133,15 +134,15 @@ class SessionModel extends BaseModel
 
     public function getByParticipant(int $participantId): array
     {
-        $stmt = $this->pdo->prepare('
+        $stmt = $this->pdo->prepare("
             SELECT s.id, s.external_id, s.tested_at, p.name AS participant_name,
                    (SELECT COUNT(*) FROM session_events se WHERE se.session_id = s.id) AS events_count,
-                   (SELECT COUNT(*) FROM session_events se WHERE se.session_id = s.id AND se.result = "ACIERTO") AS aciertos_count
+                   (SELECT COUNT(*) FROM session_events se WHERE se.session_id = s.id AND se.result = 'ACIERTO') AS aciertos_count
             FROM sessions s
             JOIN participants p ON p.id = s.participant_id
             WHERE s.participant_id = :pid
             ORDER BY s.tested_at DESC
-        ');
+        ");
         $stmt->execute([':pid' => $participantId]);
         
         $sessions = [];

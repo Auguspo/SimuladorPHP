@@ -141,7 +141,7 @@ function renderSession(session, deletedFilter) {
             <!-- Demografia -->
             <div style="background: rgba(15,23,42,0.5); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
                 <div style="flex-shrink: 0; width: 40px; display: flex; justify-content: center;">
-                    <img src="/assets/icons/group.svg" style="width: 32px; height: 32px; opacity: 0.9;" />
+                    <img src="/assets/icons/groupWhite.svg" style="width: 32px; height: 32px; opacity: 0.9;" />
                 </div>
                 <div style="display: flex; flex-direction: column;">
                     <label style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 0.1rem;">Demograf&iacute;a</label>

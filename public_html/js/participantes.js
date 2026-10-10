@@ -71,7 +71,9 @@ function applySearch() {
     const input = document.getElementById('searchInput');
     const query = (input.value || '').toLowerCase().trim();
     
+    const showDeleted = document.getElementById('showDeletedToggle').checked;
     let filtered = participantsData.filter(participant => {
+        if (!showDeleted && participant.deleted === 'Y') return false;
         const haystack = `${participant.name} ${participant.dni}`.toLowerCase();
         return haystack.includes(query);
     });
@@ -149,13 +151,26 @@ function getSortIndicator(col) {
 }
 
 function renderTable(participants, totalFiltered, totalPages) {
-    const rows = participants.map(participant => `
-        <tr>
-            <td style="font-weight: 500;"><a href="/participantes/${participant.id}" style="color: var(--primary); text-decoration: none;">${escapeHtml(participant.name)}</a></td>
-            <td>${escapeHtml(participant.dni)}</td>
+    const rows = participants.map(participant => {
+        const isDeleted = participant.deleted === 'Y';
+        const opacity = isDeleted ? '0.5' : '1';
+        const strike = isDeleted ? 'text-decoration: line-through;' : '';
+        const badge = isDeleted ? ' <span style="font-size: 0.7rem; background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 0.15rem 0.4rem; border-radius: 4px; margin-left: 0.5rem; text-decoration: none; display: inline-block;">Eliminado</span>' : '';
+        
+        return `
+        <tr style="opacity: ${opacity};">
+            <td style="font-weight: 500;">
+                <a href="/participantes/${participant.id}" style="color: var(--primary); text-decoration: none;">
+                    <span style="${strike}">${escapeHtml(participant.name)}</span>
+                </a>${badge}
+            </td>
+            <td style="${strike}">${escapeHtml(participant.dni)}</td>
             <td>${participant.sessions_count}</td>
+            <td style="text-align: right;">
+                ${!isDeleted ? `<button onclick="confirmDeleteParticipant(${participant.id}, '${escapeHtml(participant.name)}')" class="btn btn-danger btn-sm" style="padding: 0.35rem 0.75rem;">Eliminar</button>` : ''}
+            </td>
         </tr>
-    `).join('');
+    `}).join('');
 
     const startItem = totalFiltered > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
     const endItem = Math.min(currentPage * itemsPerPage, totalFiltered);
@@ -192,6 +207,7 @@ function renderTable(participants, totalFiltered, totalPages) {
                         <th onclick="sortParticipants('name')" style="cursor: pointer; user-select: none;" title="Ordenar por Nombre">Nombre${getSortIndicator('name')}</th>
                         <th onclick="sortParticipants('dni')" style="cursor: pointer; user-select: none;" title="Ordenar por DNI">DNI${getSortIndicator('dni')}</th>
                         <th onclick="sortParticipants('sessions_count')" style="cursor: pointer; user-select: none;" title="Ordenar por Sesiones">Sesiones registradas${getSortIndicator('sessions_count')}</th>
+                        <th style="text-align: right;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
@@ -215,3 +231,39 @@ document.getElementById('searchInput').addEventListener('input', () => {
     applySearch();
 });
 loadParticipants();
+
+document.getElementById('showDeletedToggle').addEventListener('change', () => {
+    currentPage = 1;
+    applySearch();
+});
+
+function confirmDeleteParticipant(id, name) {
+    if (confirm(`¿Estás seguro de que deseas eliminar al participante "${name}"?
+Esta acción no eliminará sus sesiones, pero el conductor no aparecerá en los listados regulares.`)) {
+        deleteParticipant(id);
+    }
+}
+
+async function deleteParticipant(id) {
+    try {
+        const response = await fetch('/api/delete_participant.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        });
+        
+        const data = await response.json();
+        if (data.ok) {
+            const index = participantsData.findIndex(p => p.id === id);
+            if (index !== -1) {
+                participantsData[index].deleted = 'Y';
+                applySearch();
+            }
+        } else {
+            alert('Error al eliminar: ' + (data.error || 'Desconocido'));
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Error de red al intentar eliminar el participante.');
+    }
+}

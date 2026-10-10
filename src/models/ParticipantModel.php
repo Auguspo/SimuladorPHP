@@ -9,10 +9,10 @@ class ParticipantModel extends BaseModel
     public function getAll(): array
     {
         $statement = $this->pdo->query(
-            'SELECT p.id, p.name, p.dni, COUNT(s.id) AS sessions_count
+            'SELECT p.id, p.name, p.dni, p.deleted, COUNT(s.id) AS sessions_count
              FROM participants p
              LEFT JOIN sessions s ON s.participant_id = p.id
-             GROUP BY p.id, p.name, p.dni
+             GROUP BY p.id, p.name, p.dni, p.deleted
              ORDER BY p.name ASC'
         );
 
@@ -22,6 +22,7 @@ class ParticipantModel extends BaseModel
                 'id' => (int) $row['id'],
                 'name' => $row['name'],
                 'dni' => $row['dni'],
+                'deleted' => $row['deleted'],
                 'sessions_count' => (int) $row['sessions_count'],
             ];
         }
@@ -58,5 +59,10 @@ class ParticipantModel extends BaseModel
             ':dni' => $dni,
         ]);
         return (int) $this->pdo->lastInsertId();
+    }
+    public function delete(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("UPDATE participants SET deleted = 'Y' WHERE id = ?");
+        return $stmt->execute([$id]);
     }
 }
